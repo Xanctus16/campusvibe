@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-<title>CampusVibe — Discover Campus Events</title>
+<title>Vibe Pass — Discover Campus Events</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 :root{--bg:#0c1020;--panel:#151b30;--panel2:#1c2440;--text:#f4f6ff;--muted:#aeb8d4;--accent:#ff7b36;--accent2:#8c7bff;--green:#61d6a4;--line:#2b3454}
@@ -83,7 +83,7 @@ button:hover{filter:brightness(1.08)}
 <header class="top">
   <a href="index.html" class="brand">
     <div class="logo">✦</div>
-    <div>CampusVibe <small>YOUR CAMPUS. YOUR SCENE.</small></div>
+    <div>Vibe Pass <small>SEAMLESS PASS. YOUR SCENE.</small></div>
   </a>
   <nav class="nav" id="navLinks"></nav>
 </header>
@@ -93,16 +93,16 @@ button:hover{filter:brightness(1.08)}
     <div>
       <div class="eyebrow">Campus life, all in one place</div>
       <h1>Find your people.<br>Catch your vibe.</h1>
-      <p>Discover comedy nights, raves, carnivals, gaming tournaments and more — starting around Ozoro and the campuses you care about.</p>
+      <p>Discover comedy nights, raves, carnivals, gaming tournaments and more — starting around campuse and other campuses around you.</p>
       <div class="actions">
         <button onclick="document.getElementById('eventGrid').scrollIntoView({behavior:'smooth'})">Explore events ↓</button>
       </div>
     </div>
-    <div class="hero-art"><div>SUPABASE LIVE<br><span style="color:#ffc18f">Real-time database.</span></div></div>
+    <div class="hero-art"><div>VIBEPASS LIVE<br><span style="color:#ffc18f">Seamless Access Everywhere.</span></div></div>
   </div>
   
   <div class="filters">
-    <input id="search" placeholder="Search events, DJs, organizers…" oninput="renderEvents()">
+    <input id="search" placeholder="Search events, Organizers, Campuse, DJs…" oninput="renderEvents()">
     <select id="campus" onchange="renderEvents()">
       <option value="all">All campuses</option>
       <option>SDU, Ozoro</option>
@@ -133,14 +133,14 @@ button:hover{filter:brightness(1.08)}
   </div>
 
   <div class="sectionhead">
-    <div><h2>Happening around campus</h2><p>Fetched live from your Supabase database.</p></div>
+    <div><h2>Happening around campus</h2><p>Fetched live from your campus.</p></div>
     <span class="tag" id="count">0 events</span>
   </div>
   
   <div class="grid" id="eventGrid"></div>
 </section>
 
-<div class="footer">CampusVibe • Connected to Supabase Database</div>
+<div class="footer">Vibe Pass •Seamless Pass</div>
 </div>
 
 <div id="modal" class="modal hidden" onclick="if(event.target.id==='modal')closeModal()">
