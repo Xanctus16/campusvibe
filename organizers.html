@@ -1,0 +1,275 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CampusVibe — Campus Organizers</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root{--bg:#0c1020;--panel:#151b30;--panel2:#1c2440;--text:#f4f6ff;--muted:#aeb8d4;--accent:#ff7b36;--green:#61d6a4;--line:#2b3454}
+*{box-sizing:border-box}
+body{margin:0;background:radial-gradient(circle at 80% 0,#25204d 0,transparent 35%),var(--bg);font-family:Inter,system-ui,-apple-system,sans-serif;color:var(--text);min-height:100vh}
+a{text-decoration:none}
+button,input,select{font:inherit}
+button{cursor:pointer;border:0;border-radius:12px;padding:10px 14px;font-weight:750;background:var(--accent);color:#20120b}
+button.secondary{background:var(--panel2);color:var(--text);border:1px solid var(--line)}
+button:hover{filter:brightness(1.08)}
+.wrap{max-width:1280px;margin:auto;padding:20px}
+.top{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:14px 0}
+.brand{display:flex;align-items:center;gap:10px;font-weight:900;font-size:22px;letter-spacing:-.5px;cursor:pointer;flex-shrink:0}
+.logo{width:38px;height:38px;border-radius:13px;background:linear-gradient(135deg,var(--accent),#ffcb69);display:grid;place-items:center;color:#261306;font-size:21px}
+.brand small{display:block;font-size:10px;letter-spacing:1.6px;color:var(--muted);font-weight:700}
+
+/* Standardized Navigation Header */
+.nav{display:flex;gap:4px;align-items:center;flex-wrap:wrap;justify-content:flex-end}
+.nav a{background:transparent;color:var(--muted);padding:8px 12px;border-radius:12px;font-weight:750;display:inline-flex;align-items:center;gap:4px;font-size:13px;cursor:pointer;border:1px solid transparent;transition:all 0.2s;white-space:nowrap;line-height:1.2}
+.nav a:hover{color:var(--text);border-color:var(--line);background:var(--panel2)}
+.nav a.active{background:var(--panel2);color:white;border-color:var(--line)}
+.nav a.logout-btn{color:#ffb38b;border-color:rgba(255,123,54,0.2)}
+.nav a.logout-btn:hover{background:rgba(255,123,54,0.1)}
+
+.sectionhead{display:flex;align-items:end;justify-content:space-between;gap:12px;margin:28px 0 14px}
+.sectionhead h2{margin:0;font-size:24px;letter-spacing:-.7px}
+.sectionhead p{margin:5px 0 0;color:var(--muted);font-size:13px}
+
+/* Search Controls Bar */
+.filters{display:flex;gap:10px;flex-wrap:wrap;margin:20px 0 24px}
+.filters input{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:12px 16px;color:var(--text);outline:none;flex:1;min-width:220px;font-size:14px}
+.filters input:focus{border-color:var(--accent)}
+
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:20px;padding:20px;display:flex;flex-direction:column;gap:12px}
+.meta{color:var(--muted);font-size:13px;display:flex;flex-direction:column;gap:4px}
+.tag{display:inline-flex;background:#282b4a;color:#d9d7ff;border-radius:999px;padding:4px 10px;font-size:11px;font-weight:800;width:fit-content}
+.empty{padding:40px;text-align:center;color:var(--muted);border:1px dashed var(--line);border-radius:20px;grid-column:1/-1}
+.footer{color:#7782a4;font-size:12px;text-align:center;padding:40px 0 10px}
+
+/* Toast Notification Banner */
+.cv-toast-container { position: fixed; top: 20px; right: 20px; z-index: 9999; display: flex; flex-direction: column; gap: 10px; pointer-events: none; }
+.cv-toast { pointer-events: auto; background: rgba(21, 27, 48, 0.88); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 18px; padding: 14px 18px; min-width: 300px; max-width: 380px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); display: flex; align-items: flex-start; gap: 12px; animation: slideIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards; position: relative; }
+.cv-toast-icon { width: 36px; height: 36px; border-radius: 10px; background: var(--panel2); border: 1px solid var(--line); display: grid; place-items: center; font-size: 18px; flex-shrink: 0; }
+.cv-toast-content { flex: 1; }
+.cv-toast-tag { font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; color: var(--green); margin-bottom: 2px; display: flex; align-items: center; gap: 6px; }
+.cv-toast-tag::after { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--green); display: inline-block; box-shadow: 0 0 8px var(--green); }
+.cv-toast-title { font-size: 13px; font-weight: 700; color: var(--text); margin: 0 0 2px 0; }
+.cv-toast-time { font-size: 10px; color: var(--muted); font-weight: 600; }
+.cv-toast-close { background: transparent; border: 0; color: var(--muted); font-size: 18px; padding: 0; cursor: pointer; line-height: 1; }
+@keyframes slideIn { from { opacity: 0; transform: translateY(-20px) scale(0.95); } to { opacity: 1; transform: translateY(0) scale(1); } }
+@keyframes slideOut { from { opacity: 1; transform: translateY(0) scale(1); } to { opacity: 0; transform: translateY(-20px) scale(0.95); } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <a href="index.html" class="brand">
+      <div class="logo">✦</div>
+      <div>CampusVibe <small>YOUR CAMPUS. YOUR SCENE.</small></div>
+    </a>
+    <nav class="nav" id="navLinks"></nav>
+  </header>
+
+  <section>
+    <div class="sectionhead">
+      <div>
+        <h2>Featured Organizers</h2>
+        <p>Connect with verified student brands, promoters, and event hosts across campus.</p>
+      </div>
+      <span class="tag" id="orgCount">0 Organizers</span>
+    </div>
+
+    <!-- Live Filter Input -->
+    <div class="filters">
+      <input type="text" id="orgSearch" placeholder="🔍 Search organizers by name, brand, or campus..." onkeyup="filterOrganizers()" oninput="filterOrganizers()">
+    </div>
+
+    <div class="grid" id="organizerGrid"></div>
+  </section>
+
+  <div class="footer">CampusVibe • Connected to Supabase Database</div>
+</div>
+
+<script>
+  const SUPABASE_URL = 'https://ylbqwgigsvdrglgjcpyu.supabase.co';
+  const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlsYnF3Z2lnc3ZkcmdsZ2pjcHl1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTI2NDQ1OTUsImV4cCI6MjEwODIyMDU5NX0.VjhL9UjElDZTdyjM3tX7qnk-8U_Qgrehq6yxkeVLELw';
+  const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+  let follows = JSON.parse(localStorage.getItem('cv_follows') || '[]');
+  let allOrganizers = [];
+
+  function showToast(badgeText, title, icon = '✦') {
+    let container = document.getElementById('toastContainer');
+    if (!container) {
+      container = document.createElement('div');
+      container.id = 'toastContainer';
+      container.className = 'cv-toast-container';
+      document.body.appendChild(container);
+    }
+
+    const now = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    const toast = document.createElement('div');
+    toast.className = 'cv-toast';
+    
+    toast.innerHTML = `
+      <div class="cv-toast-icon">${icon}</div>
+      <div class="cv-toast-content">
+        <div class="cv-toast-tag">${badgeText}</div>
+        <div class="cv-toast-title">${title}</div>
+        <div class="cv-toast-time">${now}</div>
+      </div>
+      <button class="cv-toast-close" onclick="this.parentElement.remove()">×</button>
+    `;
+
+    container.appendChild(toast);
+
+    setTimeout(() => {
+      toast.style.animation = 'slideOut 0.3s forwards';
+      setTimeout(() => toast.remove(), 300);
+    }, 5000);
+  }
+
+  function renderNavbar() {
+    let user = null;
+    try { user = JSON.parse(localStorage.getItem('cv_user') || 'null'); } catch(e) { user = null; }
+
+    const nav = document.getElementById('navLinks');
+    if (!nav) return;
+
+    if (!user) {
+      nav.innerHTML = `
+        <a href="index.html">Discover</a>
+        <a href="login.html" class="logout-btn">Login</a>
+      `;
+      return;
+    }
+
+    if (user.role === 'organizer') {
+      nav.innerHTML = `
+        <a href="index.html">Discover</a>
+        <a href="tickets.html">My Tickets</a>
+        <a href="organizers.html" class="active">Organizers</a>
+        <a href="organizer_dashboard.html">My Dashboard</a>
+        <a href="organizer.html">＋ Create Event</a>
+        <a href="verify.html">Scan Tickets</a>
+        <a href="#" onclick="logout()" class="logout-btn">Logout (${esc(user.nickname)})</a>
+      `;
+    } else {
+      nav.innerHTML = `
+        <a href="index.html">Discover</a>
+        <a href="tickets.html">My Tickets</a>
+        <a href="organizers.html" class="active">Organizers</a>
+        <a href="#" onclick="logout()" class="logout-btn">Logout (${esc(user.nickname)})</a>
+      `;
+    }
+  }
+
+  function logout() {
+    localStorage.removeItem('cv_user');
+    supabaseClient.auth.signOut();
+    sessionStorage.setItem('cv_flash_toast', JSON.stringify({
+      tag: 'AUTHENTICATION',
+      msg: 'Logged out successfully.',
+      icon: '🔒'
+    }));
+    window.location.href = 'login.html';
+  }
+
+  function esc(s){ return String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
+  function escAttr(s){ return String(s??'').replace(/\\/g,'\\\\').replace(/'/g,"\\'"); }
+
+  async function loadOrganizers() {
+    const grid = document.getElementById('organizerGrid');
+    grid.innerHTML = '<div class="empty">Loading campus organizers...</div>';
+
+    // 1. Fetch profiles table
+    let { data: orgs } = await supabaseClient
+      .from('profiles')
+      .select('*')
+      .eq('role', 'organizer');
+
+    // 2. Fallback to events table so existing event hosts show up
+    if (!orgs || !orgs.length) {
+      const { data: eventData } = await supabaseClient.from('events').select('organizer, campus');
+      if (eventData && eventData.length > 0) {
+        const uniqueMap = {};
+        eventData.forEach(ev => {
+          if (ev.organizer) {
+            uniqueMap[ev.organizer.toLowerCase()] = {
+              name: ev.organizer,
+              nickname: ev.organizer,
+              campus: ev.campus || 'Main Campus'
+            };
+          }
+        });
+        orgs = Object.values(uniqueMap);
+      }
+    }
+
+    allOrganizers = orgs || [];
+    filterOrganizers();
+  }
+
+  function filterOrganizers() {
+    const input = document.getElementById('orgSearch');
+    const query = (input ? input.value : '').toLowerCase().trim();
+    const grid = document.getElementById('organizerGrid');
+
+    const filtered = allOrganizers.filter(o => {
+      const nickname = String(o.nickname || '').toLowerCase();
+      const name = String(o.name || '').toLowerCase();
+      const campus = String(o.campus || '').toLowerCase();
+      return nickname.includes(query) || name.includes(query) || campus.includes(query);
+    });
+
+    document.getElementById('orgCount').textContent = `${filtered.length} Organizer${filtered.length === 1 ? '' : 's'}`;
+    grid.innerHTML = '';
+
+    if (!filtered.length) {
+      grid.innerHTML = `<div class="empty">No organizers matching "${esc(query)}" found.</div>`;
+      return;
+    }
+
+    filtered.forEach(o => {
+      const orgName = o.nickname || o.name || 'Campus Host';
+      const isFollowing = follows.includes(orgName);
+      const card = document.createElement('div');
+      card.className = 'card';
+
+      card.innerHTML = `
+        <h3 style="margin:0">${esc(orgName)}</h3>
+        <div class="meta">
+          <span>👤 Name: ${esc(o.name || 'Verified Host')}</span>
+          <span>🎓 Campus: ${esc(o.campus || 'Main Campus')}</span>
+        </div>
+        <div class="tag">VERIFIED ORGANIZER</div>
+        <button class="${isFollowing ? 'secondary' : ''}" onclick="toggleFollow('${escAttr(orgName)}')">
+          ${isFollowing ? 'Following ✓' : '＋ Follow Organizer'}
+        </button>
+      `;
+      grid.appendChild(card);
+    });
+  }
+
+  function toggleFollow(name){
+    let user = null;
+    try { user = JSON.parse(localStorage.getItem('cv_user') || 'null'); } catch(e) { user = null; }
+
+    if (!user) {
+      window.location.href = 'login.html';
+      return;
+    }
+
+    if(follows.includes(name)) {
+      follows = follows.filter(x=>x!==name);
+      showToast('ORGANIZER UNFOLLOWED', `You unfollowed ${name}`, '👥');
+    } else {
+      follows.push(name);
+      showToast('ORGANIZER FOLLOWED', `You are now following ${name}`, '⭐');
+    }
+    localStorage.setItem('cv_follows', JSON.stringify(follows));
+    filterOrganizers();
+  }
+
+  renderNavbar();
+  loadOrganizers();
+</script>
+</body>
+</html>
