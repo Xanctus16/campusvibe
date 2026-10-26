@@ -1,39 +1,33 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Vibe Pass — Login & Sign Up</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Login — VibePass</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-:root{--bg:#0c1020;--panel:#151b30;--panel2:#1c2440;--text:#f4f6ff;--muted:#aeb8d4;--accent:#ff7b36;--line:#2b3454;--green:#61d6a4}
+:root{--bg:#0c1020;--panel:#151b30;--panel2:#1c2440;--text:#f4f6ff;--muted:#aeb8d4;--accent:#ff7b36;--accent2:#8c7bff;--green:#61d6a4;--line:#2b3454}
 *{box-sizing:border-box}
-body{margin:0;background:radial-gradient(circle at 80% 0,#25204d 0,transparent 35%),var(--bg);font-family:Inter,system-ui,-apple-system,sans-serif;color:var(--text);min-height:100vh;display:flex;flex-direction:column;justify-content:space-between}
-a{text-decoration:none;color:inherit}
-button,input,select{font:inherit}
-button,.btn{cursor:pointer;border:0;border-radius:12px;padding:12px 16px;font-weight:750;background:var(--accent);color:#20120b;display:inline-block;width:100%;transition:filter 0.2s}
-button:hover,.btn:hover{filter:brightness(1.08)}
-.wrap{max-width:1180px;margin:auto;padding:20px;width:100%}
-.top{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:10px 0 22px}
-.brand{display:flex;align-items:center;gap:10px;font-weight:900;font-size:22px;letter-spacing:-.5px}
-.logo{width:38px;height:38px;border-radius:13px;background:linear-gradient(135deg,var(--accent),#ffcb69);display:grid;place-items:center;color:#261306;font-size:21px}
-.brand small{display:block;font-size:10px;letter-spacing:1.6px;color:var(--muted);font-weight:700}
-.nav{display:flex;gap:6px;flex-wrap:wrap}
-.nav a{padding:10px 14px;border-radius:12px;color:var(--muted);font-weight:700}
-.nav a.active{background:var(--panel2);color:white}
-.auth-container{max-width:440px;margin:40px auto;background:var(--panel);border:1px solid var(--line);border-radius:24px;padding:32px;box-shadow:0 12px 30px rgba(0,0,0,0.3)}
-.tabs{display:flex;background:var(--panel2);border-radius:12px;padding:4px;margin-bottom:24px;border:1px solid var(--line)}
-.tab-btn{flex:1;background:transparent;color:var(--muted);border:0;padding:10px;border-radius:8px;font-weight:700;cursor:pointer}
-.tab-btn.active{background:var(--accent);color:#20120b}
-.field{display:flex;flex-direction:column;gap:6px;margin-bottom:16px}
-.field label{font-size:12px;color:var(--muted);font-weight:750}
-.field input,.field select{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:12px;color:var(--text);outline:none;width:100%}
-.field input:focus,.field select:focus{border-color:var(--accent)}
-.notice{padding:12px 14px;border-radius:12px;background:#17372f;border:1px solid #286c58;color:#b9ffe5;font-size:13px;margin-top:16px;text-align:center}
-.notice.warning{background:#3b2c20;border-color:#805a35;color:#ffe0b8}
-.hidden{display:none!important}
-.footer{color:#7782a4;font-size:12px;text-align:center;padding:30px 0 10px}
+body{margin:0;min-height:100vh;background:radial-gradient(circle at 80% 0,#25204d 0,transparent 35%),var(--bg);font-family:Inter,system-ui,-apple-system,sans-serif;color:var(--text);display:grid;place-items:center;padding:20px}
+a{text-decoration:none;color:var(--accent)}
+button,input{font:inherit}
+button{cursor:pointer;border:0;border-radius:12px;padding:12px 16px;font-weight:750;background:var(--accent);color:#20120b;width:100%;transition:filter 0.2s}
+button:hover{filter:brightness(1.08)}
 
-/* Toast Notification Styles */
+.login-card{width:100%;max-width:420px;background:var(--panel);border:1px solid var(--line);border-radius:24px;padding:32px;box-shadow:0 20px 40px rgba(0,0,0,0.6)}
+.brand{display:flex;align-items:center;gap:12px;font-weight:900;font-size:22px;letter-spacing:-.5px;margin-bottom:24px;justify-content:center;color:var(--text)}
+.logo{width:42px;height:42px;border-radius:14px;background:linear-gradient(135deg,var(--accent),#ffcb69);display:grid;place-items:center;color:#261306;font-size:23px}
+.brand small{display:block;font-size:10px;letter-spacing:1.6px;color:var(--muted);font-weight:700}
+
+.form-group{margin-bottom:16px}
+.form-group label{display:block;font-size:13px;font-weight:700;color:var(--muted);margin-bottom:6px}
+.form-group input{width:100%;background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:12px 14px;color:var(--text);outline:none;transition:border-color 0.2s}
+.form-group input:focus{border-color:var(--accent)}
+
+.footer-note{text-align:center;margin-top:20px;font-size:13px;color:var(--muted)}
+.footer-note a{font-weight:700}
+
+/* Toast Notification Banner */
 .cv-toast-container { position: fixed; top: 20px; right: 20px; z-index: 9999; display: flex; flex-direction: column; gap: 10px; pointer-events: none; }
 .cv-toast { pointer-events: auto; background: rgba(21, 27, 48, 0.88); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 18px; padding: 14px 18px; min-width: 300px; max-width: 380px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); display: flex; align-items: flex-start; gap: 12px; animation: slideIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards; position: relative; }
 .cv-toast-icon { width: 36px; height: 36px; border-radius: 10px; background: var(--panel2); border: 1px solid var(--line); display: grid; place-items: center; font-size: 18px; flex-shrink: 0; }
@@ -48,91 +42,28 @@ button:hover,.btn:hover{filter:brightness(1.08)}
 </style>
 </head>
 <body>
-<div class="wrap">
-  <header class="top">
-    <a href="index.html" class="brand">
-      <div class="logo">✦</div>
-      <div>Vibe Pass <small>SEAMLESS PASS. YOUR SCENE.</small></div>
-    </a>
-    <nav class="nav" id="navLinks">
-      <a href="index.html">Discover</a>
-      <a href="login.html" class="active">Login</a>
-    </nav>
-  </header>
 
-  <div class="auth-container">
-    <div class="tabs">
-      <button class="tab-btn active" id="loginTabBtn" onclick="switchForm('login')">Sign In</button>
-      <button class="tab-btn" id="signupTabBtn" onclick="switchForm('signup')">Sign Up</button>
+<div class="login-card">
+  <a href="index.html" class="brand">
+    <div class="logo">✦</div>
+    <div>VibePass <small>SEAMLESS ACCESS</small></div>
+  </a>
+
+  <form id="loginForm" onsubmit="handleLogin(event)">
+    <div class="form-group">
+      <label>Email Address</label>
+      <input type="email" id="email" required placeholder="name@example.com">
     </div>
+    <div class="form-group">
+      <label>Password</label>
+      <input type="password" id="password" required placeholder="••••••••">
+    </div>
+    <button type="submit" id="submitBtn">Sign In to VibePass</button>
+  </form>
 
-    <!-- LOGIN FORM -->
-    <form id="loginForm">
-      <h2 style="margin:0 0 6px">Welcome back</h2>
-      <p style="color:var(--muted);font-size:13px;margin:0 0 20px">Sign in with your phone number or email.</p>
-      
-      <div class="field">
-        <label>Phone number or Email</label>
-        <input type="text" id="loginIdentifier" required placeholder="e.g. 08012345678 or Xanctus@gmail.com">
-      </div>
-      <div class="field">
-        <label>Password</label>
-        <input type="password" id="loginPassword" required placeholder="••••••••">
-      </div>
-      <button type="submit">Sign In</button>
-    </form>
-
-    <!-- SIGNUP FORM -->
-    <form id="signupForm" class="hidden">
-      <h2 style="margin:0 0 6px">Create an account</h2>
-      <p style="color:var(--muted);font-size:13px;margin:0 0 20px">Join Vibe pass to discover events.</p>
-
-      <div class="field">
-        <label>Full Name *</label>
-        <input type="text" id="signupName" required placeholder="e.g. Chris XANCTUS">
-      </div>
-      <div class="field">
-        <label>Nickname *</label>
-        <input type="text" id="signupNickname" required placeholder="e.g. VibeMaster or Jay">
-      </div>
-      <div class="field">
-        <label>Phone Number *</label>
-        <input type="tel" id="signupPhone" required placeholder="e.g. 08012345678">
-      </div>
-      <div class="field">
-        <label>Campus *</label>
-        <select id="signupCampus" required>
-       <option>SDU, Ozoro</option>
-       <option>SDU, Orerokpe</option>
-       <option>DELSU, Abraka</option>
-       <option>DOU, Asaba</option>
-       <option>FUPRE, Warri</option>
-       <option>UNIDEL, Agbor</option>
-       <option>Other / off-campus</option>
-        </select>
-      </div>
-      <div class="field">
-        <label>Account Type *</label>
-        <select id="signupRole" required>
-          <option value="user">Regular User (Attendee)</option>
-          <option value="organizer">Event Organizer (Host)</option>
-        </select>
-      </div>
-      <div class="field">
-        <label>Email Address (Optional)</label>
-        <input type="email" id="signupEmail" placeholder="Xanctus@gmail.com">
-      </div>
-      <div class="field">
-        <label>Password *</label>
-        <input type="password" id="signupPassword" required minlength="6" placeholder="At least 6 characters">
-      </div>
-      <button type="submit">Create Account</button>
-    </form>
-
-    <div id="authStatus"></div>
+  <div class="footer-note">
+    <p>New to VibePass? Contact your campus organizer or check <a href="index.html">Discover</a>.</p>
   </div>
-
-  <div class="footer">Vibe Pass •Seamless Pass</div>
 </div>
 
 <script>
@@ -171,167 +102,55 @@ button:hover,.btn:hover{filter:brightness(1.08)}
     }, 5000);
   }
 
-  // Check for pending redirects
-  const pendingToast = JSON.parse(sessionStorage.getItem('cv_flash_toast') || 'null');
-  if (pendingToast) {
-    showToast(pendingToast.tag, pendingToast.msg, pendingToast.icon);
-    sessionStorage.removeItem('cv_flash_toast');
-  }
-
-  function renderNavbar() {
-    let user = null;
-    try { user = JSON.parse(localStorage.getItem('cv_user') || 'null'); } catch(e) { user = null; }
-
-    const nav = document.getElementById('navLinks');
-    if (!nav) return;
-
-    if (!user) {
-      nav.innerHTML = `<a href="index.html">Discover</a><a href="login.html" class="active">Login</a>`;
-      return;
-    }
-
-    if (user.role === 'organizer') {
-      nav.innerHTML = `
-        <a href="index.html">Discover</a>
-        <a href="organizer_dashboard.html">My Dashboard</a>
-        <a href="organizer.html">＋ Create Event</a>
-        <a href="verify.html">Scan Tickets</a>
-        <a href="#" onclick="logout()" style="color:#ffb38b">Logout (${esc(user.nickname)})</a>
-      `;
-    } else {
-      nav.innerHTML = `
-        <a href="index.html">Discover</a>
-        <a href="tickets.html">My tickets</a>
-        <a href="organizers.html">Organizers</a>
-        <a href="#" onclick="logout()" style="color:#ffb38b">Logout (${esc(user.nickname)})</a>
-      `;
-    }
-  }
-
-  function esc(s){ return String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
-
-  function logout() {
-    localStorage.removeItem('cv_user');
-    supabaseClient.auth.signOut();
-    sessionStorage.setItem('cv_flash_toast', JSON.stringify({
-      tag: 'AUTHENTICATION',
-      msg: 'Logged in successfully.',
-      icon: '🔒'
-    }));
-    window.location.href = 'login.html';
-  }
-
-  renderNavbar();
-
-  function switchForm(type) {
-    const isLogin = type === 'login';
-    document.getElementById('loginForm').classList.toggle('hidden', !isLogin);
-    document.getElementById('signupForm').classList.toggle('hidden', isLogin);
-    document.getElementById('loginTabBtn').classList.toggle('active', isLogin);
-    document.getElementById('signupTabBtn').classList.toggle('active', !isLogin);
-    document.getElementById('authStatus').innerHTML = '';
-  }
-
-  // Handle Login
-  document.getElementById('loginForm').addEventListener('submit', async (e) => {
+  async function handleLogin(e) {
     e.preventDefault();
-    const statusBox = document.getElementById('authStatus');
-    statusBox.innerHTML = '<div class="notice">Signing in...</div>';
+    const email = document.getElementById('email').value.trim();
+    const password = document.getElementById('password').value;
+    const btn = document.getElementById('submitBtn');
 
-    let identifier = document.getElementById('loginIdentifier').value.trim();
-    const password = document.getElementById('loginPassword').value.trim();
+    btn.textContent = 'Signing in...';
+    btn.disabled = true;
 
-    let loginEmail = identifier;
-    if (!identifier.includes('@')) {
-      let cleanPhone = identifier.replace(/\D/g, '');
-      loginEmail = `phone_${cleanPhone}@campusvibe.local`;
-    }
-
-    const { data, error } = await supabaseClient.auth.signInWithPassword({ 
-      email: loginEmail, 
-      password 
-    });
+    const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
 
     if (error) {
-      statusBox.innerHTML = `<div class="notice warning">Error: ${error.message}</div>`;
+      showToast('LOGIN FAILED', error.message, '⚠️');
+      btn.textContent = 'Sign In to VibePass';
+      btn.disabled = false;
       return;
     }
 
-    const userId = data.user.id;
-    const meta = data.user.user_metadata || {};
+    // Fetch user profile / role data
+    const userObj = data.user;
+    let nickname = email.split('@')[0];
+    let role = 'attendee';
 
-    const userData = {
-      id: userId,
-      name: meta.name || 'User',
-      nickname: meta.nickname || 'Member',
-      campus: meta.campus || 'SDU, Ozoro',
-      role: meta.role || 'user'
-    };
+    const { data: profile } = await supabaseClient
+      .from('profiles')
+      .select('*')
+      .eq('id', userObj.id)
+      .single();
 
-    localStorage.setItem('cv_user', JSON.stringify(userData));
-    
-    // Set Toast Banner for index.html
+    if (profile) {
+      nickname = profile.nickname || profile.name || nickname;
+      role = profile.role || 'attendee';
+    }
+
+    localStorage.setItem('cv_user', JSON.stringify({
+      id: userObj.id,
+      email: userObj.email,
+      nickname: nickname,
+      role: role
+    }));
+
     sessionStorage.setItem('cv_flash_toast', JSON.stringify({
-      tag: 'AUTHENTICATION',
-      msg: 'Login successful.',
-      icon: '🔐'
+      tag: 'WELCOME BACK',
+      msg: `Logged in successfully as ${nickname}`,
+      icon: '✨'
     }));
 
     window.location.href = 'index.html';
-  });
-
-  // Handle Signup
-  document.getElementById('signupForm').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const statusBox = document.getElementById('authStatus');
-    statusBox.innerHTML = '<div class="notice">Creating account...</div>';
-
-    const name = document.getElementById('signupName').value.trim();
-    const nickname = document.getElementById('signupNickname').value.trim();
-    const phone = document.getElementById('signupPhone').value.trim();
-    const campus = document.getElementById('signupCampus').value;
-    const role = document.getElementById('signupRole').value;
-    const optionalEmail = document.getElementById('signupEmail').value.trim();
-    const password = document.getElementById('signupPassword').value.trim();
-
-    let cleanPhone = phone.replace(/\D/g, '');
-    const authEmail = optionalEmail || `phone_${cleanPhone}@campusvibe.local`;
-
-    const { data, error } = await supabaseClient.auth.signUp({
-      email: authEmail,
-      password,
-      options: {
-        data: { name, nickname, phone, campus, role }
-      }
-    });
-
-    if (error) {
-      statusBox.innerHTML = `<div class="notice warning">Error: ${error.message}</div>`;
-      return;
-    }
-
-    const userId = data.user?.id;
-
-    const userData = {
-      id: userId,
-      name,
-      nickname,
-      phone,
-      campus,
-      role
-    };
-
-    localStorage.setItem('cv_user', JSON.stringify(userData));
-    
-    // Set Toast Banner for index.html
-    sessionStorage.setItem('cv_flash_toast', JSON.stringify({
-      tag: 'ACCOUNT CREATED',
-      msg: 'Account created successfully.',
-      icon: '🎉'
-    }));
-
-    window.location.href = 'index.html';
-  });
+  }
 </script>
 </body>
 </html>
