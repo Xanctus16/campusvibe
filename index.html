@@ -1,30 +1,45 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Vibe Pass — Discover Campus Events</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>VibePass — Seamless Access</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 :root{--bg:#0c1020;--panel:#151b30;--panel2:#1c2440;--text:#f4f6ff;--muted:#aeb8d4;--accent:#ff7b36;--accent2:#8c7bff;--green:#61d6a4;--line:#2b3454}
-*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 80% 0,#25204d 0,transparent 35%),var(--bg);font-family:Inter,system-ui,-apple-system,sans-serif;color:var(--text)}
+*{box-sizing:border-box}
+body{margin:0;background:radial-gradient(circle at 80% 0,#25204d 0,transparent 35%),var(--bg);font-family:Inter,system-ui,-apple-system,sans-serif;color:var(--text)}
 a{text-decoration:none}
 button,input,select,textarea{font:inherit}
 button{cursor:pointer;border:0;border-radius:12px;padding:10px 14px;font-weight:750;background:var(--accent);color:#20120b}
 button.secondary{background:var(--panel2);color:var(--text);border:1px solid var(--line)}
 button:hover{filter:brightness(1.08)}
-.wrap{max-width:1280px;margin:auto;padding:20px}
-.top{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:14px 0}
-.brand{display:flex;align-items:center;gap:10px;font-weight:900;font-size:22px;letter-spacing:-.5px;cursor:pointer;flex-shrink:0}
+.wrap{max-width:1280px;margin:auto;padding:20px;position:relative}
+
+.top{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:14px 0;position:relative}
+.brand{display:flex;align-items:center;gap:10px;font-weight:900;font-size:22px;letter-spacing:-.5px;cursor:pointer;flex-shrink:0;color:var(--text)}
 .logo{width:38px;height:38px;border-radius:13px;background:linear-gradient(135deg,var(--accent),#ffcb69);display:grid;place-items:center;color:#261306;font-size:21px}
 .brand small{display:block;font-size:10px;letter-spacing:1.6px;color:var(--muted);font-weight:700}
 
-/* Standardized Compact Navigation Header */
-.nav{display:flex;gap:4px;align-items:center;flex-wrap:wrap;justify-content:flex-end}
+/* Standardized Navigation Header */
+.nav{display:flex;gap:6px;align-items:center;flex-wrap:wrap;justify-content:flex-end}
 .nav a{background:transparent;color:var(--muted);padding:8px 12px;border-radius:12px;font-weight:750;display:inline-flex;align-items:center;gap:4px;font-size:13px;cursor:pointer;border:1px solid transparent;transition:all 0.2s;white-space:nowrap;line-height:1.2}
 .nav a:hover{color:var(--text);border-color:var(--line);background:var(--panel2)}
 .nav a.active{background:var(--panel2);color:white;border-color:var(--line)}
 .nav a.logout-btn{color:#ffb38b;border-color:rgba(255,123,54,0.2)}
 .nav a.logout-btn:hover{background:rgba(255,123,54,0.1)}
+
+/* Mobile Hamburger Toggle Button */
+.menu-toggle {
+  display: none;
+  background: var(--panel2);
+  border: 1px solid var(--line);
+  color: var(--text);
+  font-size: 1.25rem;
+  padding: 8px 12px;
+  border-radius: 12px;
+  cursor: pointer;
+}
 
 .hero{padding:28px;border:1px solid #343558;border-radius:26px;background:linear-gradient(115deg,rgba(255,123,54,.17),rgba(140,123,255,.16)),var(--panel);display:grid;grid-template-columns:1.4fr .8fr;gap:24px;align-items:center}
 .eyebrow{color:#ffb38b;font-size:12px;font-weight:850;letter-spacing:1.8px;text-transform:uppercase}
@@ -32,13 +47,16 @@ button:hover{filter:brightness(1.08)}
 .hero p{color:var(--muted);line-height:1.6;max-width:620px}
 .hero-art{min-height:190px;border-radius:20px;background:linear-gradient(135deg,#ff7b36,#ffbd68 42%,#8c7bff 43%,#332c71);padding:18px;display:flex;align-items:end;position:relative;overflow:hidden}
 .hero-art div{position:relative;background:#17142ad9;padding:14px 16px;border-radius:14px;font-weight:800}
+
 .filters{display:flex;gap:10px;flex-wrap:wrap;margin:24px 0}
 .filters input,.filters select{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:12px;color:var(--text);outline:none}
 .filters input{flex:1;min-width:190px}
 .filters select{min-width:145px}
+
 .sectionhead{display:flex;align-items:end;justify-content:space-between;gap:12px;margin:28px 0 14px}
 .sectionhead h2{margin:0;font-size:24px;letter-spacing:-.7px}
 .sectionhead p{margin:5px 0 0;color:var(--muted);font-size:13px}
+
 .grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
 .card{background:var(--panel);border:1px solid var(--line);border-radius:20px;overflow:hidden;display:flex;flex-direction:column}
 .poster{height:150px;padding:16px;display:flex;align-items:end;position:relative;overflow:hidden;background:linear-gradient(135deg,#fd7b4c,#e43f76)}
@@ -53,10 +71,12 @@ button:hover{filter:brightness(1.08)}
 .tag.past-tag{background:rgba(255,255,255,0.08);color:var(--muted)}
 .tag.active-tag{background:rgba(97,214,164,0.15);color:var(--green)}
 .actions{display:flex;gap:8px;flex-wrap:wrap}
+
 .box{background:var(--panel);border:1px solid var(--line);border-radius:20px;padding:20px}
 .footer{color:#7782a4;font-size:12px;text-align:center;padding:30px 0 10px}
 .empty{padding:32px;text-align:center;color:var(--muted);border:1px dashed var(--line);border-radius:18px}
-.modal{position:fixed;inset:0;background:#050711d9;display:grid;place-items:center;padding:18px;z-index:5}
+
+.modal{position:fixed;inset:0;background:#050711d9;display:grid;place-items:center;padding:18px;z-index:1000}
 .modalbox{max-width:520px;width:100%;max-height:90vh;overflow:auto;background:var(--panel);border:1px solid var(--line);border-radius:22px;padding:22px}
 .close{float:right;background:transparent;color:var(--muted);font-size:24px;padding:0 5px;border:0;cursor:pointer}
 .hidden{display:none!important}
@@ -74,8 +94,37 @@ button:hover{filter:brightness(1.08)}
 @keyframes slideIn { from { opacity: 0; transform: translateY(-20px) scale(0.95); } to { opacity: 1; transform: translateY(0) scale(1); } }
 @keyframes slideOut { from { opacity: 1; transform: translateY(0) scale(1); } to { opacity: 0; transform: translateY(-20px) scale(0.95); } }
 
-@media(max-width:800px){.hero{grid-template-columns:1fr}.grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
-@media(max-width:520px){.wrap{padding:13px}.grid{grid-template-columns:1fr}.poster{height:135px}.hero{padding:20px}.top{padding-bottom:14px}}
+/* Mobile Navigation Breakpoint */
+@media(max-width:850px){
+  .menu-toggle { display: block; }
+  .nav {
+    display: none;
+    flex-direction: column;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    padding: 16px;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.8);
+    z-index: 1000;
+    align-items: stretch;
+    justify-content: flex-start;
+  }
+  .nav.active { display: flex; }
+  .nav a { justify-content: center; padding: 12px; font-size: 14px; width: 100%; }
+  .hero{grid-template-columns:1fr}
+  .grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media(max-width:520px){
+  .wrap{padding:13px}
+  .grid{grid-template-columns:1fr}
+  .poster{height:135px}
+  .hero{padding:20px}
+  .top{padding-bottom:14px}
+}
 </style>
 </head>
 <body>
@@ -83,8 +132,9 @@ button:hover{filter:brightness(1.08)}
 <header class="top">
   <a href="index.html" class="brand">
     <div class="logo">✦</div>
-    <div>Vibe Pass <small>SEAMLESS PASS. YOUR SCENE.</small></div>
+    <div>VibePass <small>SEAMLESS ACCESS</small></div>
   </a>
+  <button class="menu-toggle" id="menuToggle" aria-label="Toggle Navigation">☰</button>
   <nav class="nav" id="navLinks"></nav>
 </header>
 
@@ -93,7 +143,7 @@ button:hover{filter:brightness(1.08)}
     <div>
       <div class="eyebrow">Campus life, all in one place</div>
       <h1>Find your people.<br>Catch your vibe.</h1>
-      <p>Discover comedy nights, raves, carnivals, gaming tournaments and more — starting around campuse and other campuses around you.</p>
+      <p>Discover comedy nights, raves, carnivals, gaming tournaments and more — starting around campus and other campuses around you.</p>
       <div class="actions">
         <button onclick="document.getElementById('eventGrid').scrollIntoView({behavior:'smooth'})">Explore events ↓</button>
       </div>
@@ -102,7 +152,7 @@ button:hover{filter:brightness(1.08)}
   </div>
   
   <div class="filters">
-    <input id="search" placeholder="Search events, Organizers, Campuse, DJs…" oninput="renderEvents()">
+    <input id="search" placeholder="Search events, Organizers, Campus, DJs…" oninput="renderEvents()">
     <select id="campus" onchange="renderEvents()">
       <option value="all">All campuses</option>
       <option>SDU, Ozoro</option>
@@ -140,7 +190,7 @@ button:hover{filter:brightness(1.08)}
   <div class="grid" id="eventGrid"></div>
 </section>
 
-<div class="footer">Vibe Pass •Seamless Pass</div>
+<div class="footer">VibePass • Seamless Access</div>
 </div>
 
 <div id="modal" class="modal hidden" onclick="if(event.target.id==='modal')closeModal()">
@@ -154,6 +204,16 @@ button:hover{filter:brightness(1.08)}
 
   let events = [];
   let follows = JSON.parse(localStorage.getItem('cv_follows') || '[]');
+
+  // Mobile Menu Toggle Script
+  const menuToggle = document.getElementById('menuToggle');
+  const navLinksEl = document.getElementById('navLinks');
+  if (menuToggle && navLinksEl) {
+    menuToggle.addEventListener('click', () => {
+      navLinksEl.classList.toggle('active');
+      menuToggle.textContent = navLinksEl.classList.contains('active') ? '✕' : '☰';
+    });
+  }
 
   function showToast(badgeText, title, icon = '✦') {
     let container = document.getElementById('toastContainer');
