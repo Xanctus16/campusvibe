@@ -1,105 +1,286 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Vibe Pass — My Tickets</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ticket Pass — VibePass</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.1/build/qrcode.min.js"></script>
 <style>
-:root{--bg:#0c1020;--panel:#151b30;--panel2:#1c2440;--text:#f4f6ff;--muted:#aeb8d4;--accent:#ff7b36;--line:#2b3454;--green:#61d6a4}
-*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 80% 0,#25204d 0,transparent 35%),var(--bg);font-family:Inter,system-ui,sans-serif;color:var(--text)}
-a{text-decoration:none;color:inherit}
-.wrap{max-width:1180px;margin:auto;padding:20px}
-.top{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:10px 0 22px}
-.brand{display:flex;align-items:center;gap:10px;font-weight:900;font-size:22px}
+:root{--bg:#0c1020;--panel:#151b30;--panel2:#1c2440;--text:#f4f6ff;--muted:#aeb8d4;--accent:#ff7b36;--accent2:#8c7bff;--green:#61d6a4;--line:#2b3454}
+*{box-sizing:border-box}
+body{margin:0;background:radial-gradient(circle at 80% 0,#25204d 0,transparent 35%),var(--bg);font-family:Inter,system-ui,-apple-system,sans-serif;color:var(--text)}
+a{text-decoration:none}
+button,input,select,textarea{font:inherit}
+button{cursor:pointer;border:0;border-radius:12px;padding:10px 14px;font-weight:750;background:var(--accent);color:#20120b;transition:filter 0.2s}
+button.secondary{background:var(--panel2);color:var(--text);border:1px solid var(--line)}
+button:hover{filter:brightness(1.08)}
+.wrap{max-width:1280px;margin:auto;padding:20px;position:relative}
+
+.top{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:14px 0;position:relative}
+.brand{display:flex;align-items:center;gap:10px;font-weight:900;font-size:22px;letter-spacing:-.5px;cursor:pointer;flex-shrink:0;color:var(--text)}
 .logo{width:38px;height:38px;border-radius:13px;background:linear-gradient(135deg,var(--accent),#ffcb69);display:grid;place-items:center;color:#261306;font-size:21px}
 .brand small{display:block;font-size:10px;letter-spacing:1.6px;color:var(--muted);font-weight:700}
-.nav{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
-.nav a{padding:10px 14px;border-radius:12px;color:var(--muted);font-weight:700}
-.nav a.active{background:var(--panel2);color:white}
-.sectionhead{display:flex;align-items:end;justify-content:space-between;gap:12px;margin:28px 0 14px}
-.ticket{background:#fff;color:#171827;border-radius:18px;padding:20px;max-width:420px;margin:14px 0;position:relative}
-.ticketlogo{font-weight:950;color:#ea672f;font-size:12px;margin-bottom:8px;display:flex;justify-content:space-between}
-.badge{padding:4px 8px;border-radius:6px;font-size:10px;font-weight:800;text-transform:uppercase}
-.badge.valid{background:#e6f7f0;color:#108a55}
-.badge.used{background:#ffebe6;color:#d9381e}
-.empty{padding:32px;text-align:center;color:var(--muted);border:1px dashed var(--line);border-radius:18px}
+
+/* Standardized Navigation Header */
+.nav{display:flex;gap:6px;align-items:center;flex-wrap:wrap;justify-content:flex-end}
+.nav a{background:transparent;color:var(--muted);padding:8px 12px;border-radius:12px;font-weight:750;display:inline-flex;align-items:center;gap:4px;font-size:13px;cursor:pointer;border:1px solid transparent;transition:all 0.2s;white-space:nowrap;line-height:1.2}
+.nav a:hover{color:var(--text);border-color:var(--line);background:var(--panel2)}
+.nav a.active{background:var(--panel2);color:white;border-color:var(--line)}
+.nav a.logout-btn{color:#ffb38b;border-color:rgba(255,123,54,0.2)}
+.nav a.logout-btn:hover{background:rgba(255,123,54,0.1)}
+
+/* Mobile Hamburger Toggle Button */
+.menu-toggle {
+  display: none;
+  background: var(--panel2);
+  border: 1px solid var(--line);
+  color: var(--text);
+  font-size: 1.25rem;
+  padding: 8px 12px;
+  border-radius: 12px;
+  cursor: pointer;
+}
+
+/* Digital Pass Stub Style */
+.ticket-container{max-width:480px;margin:30px auto}
+.pass-card{background:var(--panel);border:1px solid var(--line);border-radius:24px;overflow:hidden;box-shadow:0 20px 50px rgba(0,0,0,0.6);position:relative}
+.pass-header{background:linear-gradient(135deg,var(--accent),#ff9e3d);padding:24px;color:#20120b}
+.pass-header .eyebrow{font-size:11px;font-weight:850;letter-spacing:1.5px;text-transform:uppercase;opacity:0.8}
+.pass-header h1{margin:6px 0 0;font-size:24px;letter-spacing:-.5px;line-height:1.15}
+
+.pass-body{padding:24px;display:flex;flex-direction:column;gap:18px}
+.info-row{display:flex;justify-content:space-between;gap:12px}
+.info-block label{display:block;font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase;margin-bottom:4px}
+.info-block span{font-size:15px;font-weight:700;color:var(--text)}
+
+.qr-section{background:var(--panel2);border:1px solid var(--line);border-radius:18px;padding:20px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:12px}
+.qr-section canvas{background:#fff;padding:12px;border-radius:14px;max-width:180px;width:100%;height:auto}
+.ticket-id{font-family:monospace;font-size:16px;font-weight:800;letter-spacing:1px;color:var(--accent)}
+
+.tag{display:inline-flex;background:#282b4a;color:#d9d7ff;border-radius:999px;padding:5px 12px;font-size:11px;font-weight:800}
+.tag.valid-tag{background:rgba(97,214,164,0.15);color:var(--green)}
+.tag.used-tag{background:rgba(255,255,255,0.08);color:var(--muted)}
+
 .footer{color:#7782a4;font-size:12px;text-align:center;padding:30px 0 10px}
+.empty{padding:32px;text-align:center;color:var(--muted);border:1px dashed var(--line);border-radius:18px}
+
+/* Toast Notification Banner */
+.cv-toast-container { position: fixed; top: 20px; right: 20px; z-index: 9999; display: flex; flex-direction: column; gap: 10px; pointer-events: none; }
+.cv-toast { pointer-events: auto; background: rgba(21, 27, 48, 0.88); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 18px; padding: 14px 18px; min-width: 300px; max-width: 380px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); display: flex; align-items: flex-start; gap: 12px; animation: slideIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards; position: relative; }
+.cv-toast-icon { width: 36px; height: 36px; border-radius: 10px; background: var(--panel2); border: 1px solid var(--line); display: grid; place-items: center; font-size: 18px; flex-shrink: 0; }
+.cv-toast-content { flex: 1; }
+.cv-toast-tag { font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; color: var(--green); margin-bottom: 2px; display: flex; align-items: center; gap: 6px; }
+.cv-toast-tag::after { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--green); display: inline-block; box-shadow: 0 0 8px var(--green); }
+.cv-toast-title { font-size: 13px; font-weight: 700; color: var(--text); margin: 0 0 2px 0; }
+.cv-toast-time { font-size: 10px; color: var(--muted); font-weight: 600; }
+.cv-toast-close { background: transparent; border: 0; color: var(--muted); font-size: 18px; padding: 0; cursor: pointer; line-height: 1; }
+@keyframes slideIn { from { opacity: 0; transform: translateY(-20px) scale(0.95); } to { opacity: 1; transform: translateY(0) scale(1); } }
+@keyframes slideOut { from { opacity: 1; transform: translateY(0) scale(1); } to { opacity: 0; transform: translateY(-20px) scale(0.95); } }
+
+/* Mobile Navigation Breakpoint */
+@media(max-width:850px){
+  .menu-toggle { display: block; }
+  .nav {
+    display: none;
+    flex-direction: column;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    padding: 16px;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.8);
+    z-index: 1000;
+    align-items: stretch;
+    justify-content: flex-start;
+  }
+  .nav.active { display: flex; }
+  .nav a { justify-content: center; padding: 12px; font-size: 14px; width: 100%; }
+}
+@media(max-width:520px){
+  .wrap{padding:13px}
+  .ticket-container{margin:15px auto}
+}
 </style>
 </head>
 <body>
+
 <div class="wrap">
-  <header class="top">
-    <a href="index.html" class="brand">
-      <div class="logo">✦</div>
-      <div>Vibe Pass <small>SEAMLESS PASS. YOUR SCENE.</small></div>
-    </a>
-    <nav class="nav">
-      <a href="index.html">Discover</a>
-      <a href="tickets.html" class="active">My tickets</a>
-      <a href="organizers.html">Organizers</a>
-      <a href="#" onclick="logout()" style="color:#ffb38b">Logout</a>
-    </nav>
-  </header>
+<header class="top">
+  <a href="index.html" class="brand">
+    <div class="logo">✦</div>
+    <div>VibePass <small>SEAMLESS ACCESS</small></div>
+  </a>
+  <button class="menu-toggle" id="menuToggle" aria-label="Toggle Navigation">☰</button>
+  <nav class="nav" id="navLinks"></nav>
+</header>
 
-  <div class="sectionhead">
-    <div><h2>My tickets</h2><p>Your saved ticket passes.</p></div>
-  </div>
+<div class="ticket-container" id="ticketContent">
+  <div class="empty">Loading ticket pass details...</div>
+</div>
 
-  <div id="ticketList"></div>
-
-  <div class="footer">Vibe Pass • Seamless Pass</div>
+<div class="footer">VibePass • Seamless Access</div>
 </div>
 
 <script>
-  // 1. Route Security Check
-  let user = null;
-  try {
-    user = JSON.parse(localStorage.getItem('cv_user') || 'null');
-  } catch(e) { user = null; }
+  const SUPABASE_URL = 'https://ylbqwgigsvdrglgjcpyu.supabase.co';
+  const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlsYnF3Z2lnc3ZkcmdsZ2pjcHl1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTI2NDQ1OTUsImV4cCI6MjEwODIyMDU5NX0.VjhL9UjElDZTdyjM3tX7qnk-8U_Qgrehq6yxkeVLELw';
+  const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-  if (!user) {
-    window.location.href = 'login.html';
+  // Mobile Menu Toggle Script
+  const menuToggle = document.getElementById('menuToggle');
+  const navLinksEl = document.getElementById('navLinks');
+  if (menuToggle && navLinksEl) {
+    menuToggle.addEventListener('click', () => {
+      navLinksEl.classList.toggle('active');
+      menuToggle.textContent = navLinksEl.classList.contains('active') ? '✕' : '☰';
+    });
   }
 
-  const SUPABASE_URL = 'https://ylbqwgigsvdrglgjcpyu.supabase.co';
-  const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlsYnF3Z2lnc3ZkcmdsZ2pjcHl1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MDY3ODkwMDAsImV4cCI6MjAyMjM2NTAwMH0.placeholder'; // Ensure your copied anon key is pasted here
-  const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  function renderNavbar() {
+    let user = null;
+    try {
+      user = JSON.parse(localStorage.getItem('cv_user') || 'null');
+    } catch(e) { user = null; }
+
+    const nav = document.getElementById('navLinks');
+    if (!nav) return;
+
+    if (!user) {
+      window.location.href = 'login.html';
+      return;
+    }
+
+    if (user.role === 'organizer') {
+      nav.innerHTML = `
+        <a href="index.html">Discover</a>
+        <a href="tickets.html" class="active">My Tickets</a>
+        <a href="organizers.html">Organizers</a>
+        <a href="organizer_dashboard.html">Dashboard</a>
+        <a href="organizer.html">＋ Create Event</a>
+        <a href="verify.html">Scan Tickets</a>
+        <a href="#" onclick="logout()" class="logout-btn">Logout (${esc(user.nickname)})</a>
+      `;
+    } else {
+      nav.innerHTML = `
+        <a href="index.html">Discover</a>
+        <a href="tickets.html" class="active">My Tickets</a>
+        <a href="organizers.html">Organizers</a>
+        <a href="#" onclick="logout()" class="logout-btn">Logout (${esc(user.nickname)})</a>
+      `;
+    }
+  }
+
+  function esc(s){ return String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
+  function niceDate(d){ if(!d)return 'Date TBA'; return new Date(d+'T12:00:00').toLocaleDateString('en-NG',{day:'numeric',month:'short',year:'numeric'}); }
 
   function logout() {
     localStorage.removeItem('cv_user');
     supabaseClient.auth.signOut();
-    window.location.href = 'index.html';
+    window.location.href = 'login.html';
   }
 
-  function niceDate(d){ return !d ? 'Date TBA' : new Date(d+'T12:00:00').toLocaleDateString('en-NG',{day:'numeric',month:'short',year:'numeric'}); }
-  function esc(s){ return String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
+  async function loadTicketPass() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const ticketId = urlParams.get('id');
 
-  function renderTickets(){
-    let tickets = JSON.parse(localStorage.getItem('cv_tickets') || '[]');
-    let box = document.getElementById('ticketList');
-
-    if(!tickets.length){
-      box.innerHTML = '<div class="empty">No tickets booked yet. Check out events on the <a href="index.html" style="color:var(--accent)">Discover</a> page!</div>';
+    if (!ticketId) {
+      document.getElementById('ticketContent').innerHTML = '<div class="empty">No ticket pass specified. <a href="tickets.html" style="color:var(--accent);">Return to My Tickets</a></div>';
       return;
     }
 
-    box.innerHTML = tickets.slice().reverse().map(t=>`
-      <div class="ticket">
-        <div class="ticketlogo">
-          <span>CAMPUSVIBE / TICKET PASS</span>
-          <span class="badge ${t.status === 'used' ? 'used' : 'valid'}">${t.status === 'used' ? 'USED' : 'VALID'}</span>
+    // Try fetching from Supabase
+    let { data: ticket, error } = await supabaseClient
+      .from('tickets')
+      .select('*, events(*)')
+      .eq('id', ticketId)
+      .single();
+
+    // Fallback to local storage
+    if (error || !ticket) {
+      const localTickets = JSON.parse(localStorage.getItem('cv_tickets') || '[]');
+      const found = localTickets.find(t => t.id === ticketId);
+      if (found) {
+        ticket = {
+          id: found.id,
+          user_name: found.user_name || 'Attendee Pass',
+          status: found.status || 'valid',
+          events: {
+            name: found.name,
+            date: found.date,
+            venue: found.venue,
+            campus: found.campus
+          }
+        };
+      }
+    }
+
+    if (!ticket) {
+      document.getElementById('ticketContent').innerHTML = '<div class="empty">Invalid or expired ticket pass.</div>';
+      return;
+    }
+
+    const eventData = ticket.events || {};
+    const isValid = (ticket.status || 'valid') === 'valid';
+
+    const container = document.getElementById('ticketContent');
+    container.innerHTML = `
+      <div class="pass-card">
+        <div class="pass-header">
+          <div class="eyebrow">OFFICIAL VIBEPASS TICKET</div>
+          <h1>${esc(eventData.name || 'Campus Event')}</h1>
         </div>
-        <h2 style="margin:0 0 10px">${esc(t.name)}</h2>
-        <p style="margin:0;color:#444">
-          📅 ${niceDate(t.date)}<br>
-          📍 ${esc(t.venue)}<br>
-          🎓 ${esc(t.campus)}<br>
-          Reference Code: <strong>${esc(t.id)}</strong>
-        </p>
-      </div>`).join('');
+        
+        <div class="pass-body">
+          <div class="info-row">
+            <div class="info-block">
+              <label>Pass Holder</label>
+              <span>${esc(ticket.user_name || 'Attendee')}</span>
+            </div>
+            <div class="info-block" style="text-align:right;">
+              <label>Status</label>
+              <span class="tag ${isValid ? 'valid-tag' : 'used-tag'}">${isValid ? 'VALID PASS' : 'USED / SCANNED'}</span>
+            </div>
+          </div>
+
+          <div class="info-row">
+            <div class="info-block">
+              <label>Campus</label>
+              <span>📍 ${esc(eventData.campus || 'Main Campus')}</span>
+            </div>
+            <div class="info-block" style="text-align:right;">
+              <label>Event Date</label>
+              <span>📅 ${niceDate(eventData.date)}</span>
+            </div>
+          </div>
+
+          <div class="info-block">
+            <label>Venue</label>
+            <span>${esc(eventData.venue || 'Campus Venue')}</span>
+          </div>
+
+          <div class="qr-section">
+            <canvas id="qrCanvas"></canvas>
+            <div class="ticket-id">${esc(ticket.id)}</div>
+            <small style="color:var(--muted);font-size:12px;">Present this QR code at the door for instant scan entry.</small>
+          </div>
+
+          <button class="secondary" style="width:100%;" onclick="window.location.href='tickets.html'">← Back to Wallet</button>
+        </div>
+      </div>
+    `;
+
+    // Generate QR Code
+    QRCode.toCanvas(document.getElementById('qrCanvas'), ticket.id, { width: 180, margin: 1 }, function (err) {
+      if (err) console.error(err);
+    });
   }
 
-  renderTickets();
+  renderNavbar();
+  loadTicketPass();
 </script>
 </body>
 </html>
