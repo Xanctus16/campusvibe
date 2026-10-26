@@ -3,17 +3,17 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Organizer Dashboard — VibePass</title>
+<title>VibePass — Organizer Dashboard</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 :root{--bg:#0c1020;--panel:#151b30;--panel2:#1c2440;--text:#f4f6ff;--muted:#aeb8d4;--accent:#ff7b36;--accent2:#8c7bff;--green:#61d6a4;--line:#2b3454}
 *{box-sizing:border-box}
-body{margin:0;background:radial-gradient(circle at 80% 0,#25204d 0,transparent 35%),var(--bg);font-family:Inter,system-ui,-apple-system,sans-serif;color:var(--text)}
+body{margin:0;background:radial-gradient(circle at 80% 0,#25204d 0,transparent 35%),var(--bg);font-family:Inter,system-ui,-apple-system,sans-serif;color:var(--text);min-height:100vh}
 a{text-decoration:none}
-button,input,select,textarea{font:inherit}
-button{cursor:pointer;border:0;border-radius:12px;padding:10px 14px;font-weight:750;background:var(--accent);color:#20120b;transition:filter 0.2s}
-button.secondary{background:var(--panel2);color:var(--text);border:1px solid var(--line)}
-button:hover{filter:brightness(1.08)}
+button,input,select{font:inherit}
+button,.btn{cursor:pointer;border:0;border-radius:12px;padding:10px 14px;font-weight:750;background:var(--accent);color:#20120b;display:inline-block;text-align:center;transition:filter 0.2s}
+button.secondary,.btn.secondary{background:var(--panel2);color:var(--text);border:1px solid var(--line)}
+button:hover,.btn:hover{filter:brightness(1.08)}
 .wrap{max-width:1280px;margin:auto;padding:20px;position:relative}
 
 .top{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:14px 0;position:relative}
@@ -22,7 +22,7 @@ button:hover{filter:brightness(1.08)}
 .brand small{display:block;font-size:10px;letter-spacing:1.6px;color:var(--muted);font-weight:700}
 
 /* Standardized Navigation Header */
-.nav{display:flex;gap:6px;align-items:center;flex-wrap:wrap;justify-content:flex-end}
+.nav{display:flex;gap:4px;align-items:center;flex-wrap:wrap;justify-content:flex-end}
 .nav a{background:transparent;color:var(--muted);padding:8px 12px;border-radius:12px;font-weight:750;display:inline-flex;align-items:center;gap:4px;font-size:13px;cursor:pointer;border:1px solid transparent;transition:all 0.2s;white-space:nowrap;line-height:1.2}
 .nav a:hover{color:var(--text);border-color:var(--line);background:var(--panel2)}
 .nav a.active{background:var(--panel2);color:white;border-color:var(--line)}
@@ -41,25 +41,69 @@ button:hover{filter:brightness(1.08)}
   cursor: pointer;
 }
 
-.dashboard-head{margin:20px 0 24px}
-.dashboard-head h1{font-size:28px;letter-spacing:-1px;margin:0 0 6px 0}
-.dashboard-head p{color:var(--muted);margin:0;font-size:14px}
+.sectionhead{display:flex;align-items:end;justify-content:space-between;gap:12px;margin:28px 0 14px}
+.sectionhead h2{margin:0;font-size:24px;letter-spacing:-.7px}
+.sectionhead p{margin:5px 0 0;color:var(--muted);font-size:13px}
 
-.stats-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin-bottom:28px}
-.stat-card{background:var(--panel);border:1px solid var(--line);border-radius:20px;padding:20px}
-.stat-card .label{font-size:12px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px}
-.stat-card .value{font-size:28px;font-weight:900;margin-top:6px;color:var(--text)}
+/* Dashboard 2-Column Sidebar Layout */
+.dashboard-layout{display:grid;grid-template-columns:310px 1fr;gap:24px;margin-top:20px}
 
-.sectionhead{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:28px 0 16px}
-.sectionhead h2{margin:0;font-size:22px;letter-spacing:-.5px}
+/* Left Sidebar Profile Card */
+.profile-card{background:var(--panel);border:1px solid var(--line);border-radius:24px;padding:24px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:14px;height:fit-content;position:sticky;top:20px}
+.avatar{width:84px;height:84px;border-radius:50%;background:linear-gradient(135deg,var(--accent),#ffcb69);display:grid;place-items:center;font-size:36px;font-weight:900;color:#20120b;border:3px solid var(--panel2);box-shadow:0 8px 24px rgba(255,123,54,0.25)}
+.profile-info{display:flex;flex-direction:column;gap:4px;width:100%}
+.profile-info h3{margin:0;font-size:21px;letter-spacing:-.5px;font-weight:850}
+.profile-info .email{font-size:13px;color:var(--muted);word-break:break-all;font-weight:500}
+.profile-badges{display:flex;flex-direction:column;gap:10px;width:100%;margin-top:6px}
 
-.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+/* Verified Organizer Badge */
+.badge-verified{background:rgba(97,214,164,0.12);color:var(--green);border:1px solid rgba(97,214,164,0.3);border-radius:999px;padding:7px 14px;font-size:11px;font-weight:800;letter-spacing:0.6px;display:flex;align-items:center;justify-content:center;gap:6px}
+
+/* Institution Badge */
+.badge-campus{
+  background:linear-gradient(135deg, rgba(255,123,54,0.18), rgba(140,123,255,0.18));
+  color:#f4f6ff;
+  border:1.5px solid rgba(255,123,54,0.4);
+  border-radius:16px;
+  padding:10px 16px;
+  font-size:13px;
+  font-weight:800;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+  box-shadow:0 4px 16px rgba(0,0,0,0.25);
+  letter-spacing:-.2px;
+}
+.badge-campus-icon{
+  background:linear-gradient(135deg,var(--accent),#ffcb69);
+  color:#20120b;
+  width:22px;
+  height:22px;
+  border-radius:6px;
+  display:grid;
+  place-items:center;
+  font-size:12px;
+  flex-shrink:0;
+  font-weight:900;
+}
+
+/* Metrics Cards Grid */
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px;margin-bottom:24px}
+.stat-card{background:var(--panel);border:1px solid var(--line);border-radius:20px;padding:20px;display:flex;flex-direction:column;gap:6px}
+.stat-card .num{font-size:26px;font-weight:900;color:var(--accent)}
+.stat-card .lbl{font-size:11px;color:var(--muted);font-weight:750;text-transform:uppercase;letter-spacing:0.8px}
+
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px}
 .card{background:var(--panel);border:1px solid var(--line);border-radius:20px;padding:20px;display:flex;flex-direction:column;gap:12px}
-.card h3{margin:0;font-size:18px}
-.meta{color:var(--muted);font-size:13px;display:flex;gap:10px;flex-wrap:wrap}
-.empty{padding:32px;text-align:center;color:var(--muted);border:1px dashed var(--line);border-radius:18px;grid-column:1/-1}
+.meta{color:var(--muted);font-size:13px;display:flex;flex-direction:column;gap:4px}
 
-.footer{color:#7782a4;font-size:12px;text-align:center;padding:30px 0 10px}
+.tag{display:inline-flex;border-radius:999px;padding:4px 10px;font-size:11px;font-weight:800;width:fit-content}
+.tag.active-tag{background:rgba(97,214,164,0.15);color:var(--green)}
+.tag.past-tag{background:rgba(255,255,255,0.08);color:var(--muted)}
+
+.empty{padding:40px;text-align:center;color:var(--muted);border:1px dashed var(--line);border-radius:20px;grid-column:1/-1}
+.footer{color:#7782a4;font-size:12px;text-align:center;padding:40px 0 10px}
 
 /* Toast Notification Banner */
 .cv-toast-container { position: fixed; top: 20px; right: 20px; z-index: 9999; display: flex; flex-direction: column; gap: 10px; pointer-events: none; }
@@ -74,8 +118,8 @@ button:hover{filter:brightness(1.08)}
 @keyframes slideIn { from { opacity: 0; transform: translateY(-20px) scale(0.95); } to { opacity: 1; transform: translateY(0) scale(1); } }
 @keyframes slideOut { from { opacity: 1; transform: translateY(0) scale(1); } to { opacity: 0; transform: translateY(-20px) scale(0.95); } }
 
-/* Mobile Navigation Breakpoint */
-@media(max-width:850px){
+/* Mobile Navigation Breakpoint & Hamburger Menu Styles */
+@media(max-width:880px){
   .menu-toggle { display: block; }
   .nav {
     display: none;
@@ -94,55 +138,78 @@ button:hover{filter:brightness(1.08)}
     justify-content: flex-start;
   }
   .nav.active { display: flex; }
-  .nav a { justify-content: center; padding: 12px; font-size: 14px; width: 100%; }
-  .stats-grid { grid-template-columns: 1fr; }
-  .grid { grid-template-columns: 1fr; }
-}
-@media(max-width:520px){
-  .wrap{padding:13px}
+  .nav a { justify-content: center; padding: 12px; font-size: 14px; width: 100%; text-align: center; }
+  .dashboard-layout{grid-template-columns:1fr}
+  .profile-card{position:static}
 }
 </style>
 </head>
 <body>
-
 <div class="wrap">
-<header class="top">
-  <a href="index.html" class="brand">
-    <div class="logo">✦</div>
-    <div>VibePass <small>SEAMLESS ACCESS</small></div>
-  </a>
-  <button class="menu-toggle" id="menuToggle" aria-label="Toggle Navigation">☰</button>
-  <nav class="nav" id="navLinks"></nav>
-</header>
+  <header class="top">
+    <a href="index.html" class="brand">
+      <div class="logo">✦</div>
+      <div>VibePass <small>SEAMLESS ACCESS</small></div>
+    </a>
+    <button class="menu-toggle" id="menuToggle" aria-label="Toggle Navigation">☰</button>
+    <nav class="nav" id="navLinks"></nav>
+  </header>
 
-<div class="dashboard-head">
-  <h1>📊 Organizer Dashboard</h1>
-  <p>Track performance, ticket sales, and events hosted under your brand.</p>
-</div>
+  <div class="dashboard-layout">
+    <!-- LEFT SIDEBAR: ORGANIZER PROFILE -->
+    <aside class="profile-card" id="profileSidebar">
+      <div class="avatar" id="profAvatar">✦</div>
+      <div class="profile-info">
+        <h3 id="profNickname">Organizer</h3>
+        <span class="email" id="profEmail">Loading email...</span>
+      </div>
+      <div class="profile-badges">
+        <div class="badge-verified">✦ VERIFIED ORGANIZER</div>
+        <div class="badge-campus" id="profCampus">
+          <span class="badge-campus-icon">🏛️</span>
+          <span id="profCampusText">Main Campus</span>
+        </div>
+      </div>
+    </aside>
 
-<div class="stats-grid">
-  <div class="stat-card">
-    <div class="label">Total Events Hosted</div>
-    <div class="value" id="statEvents">0</div>
+    <!-- RIGHT MAIN CONTENT: ANALYTICS & EVENTS -->
+    <main>
+      <div class="sectionhead" style="margin-top:0">
+        <div>
+          <h2>Organizer Dashboard</h2>
+          <p>Real-time analytics and event overview for your hosted campus events.</p>
+        </div>
+        <a href="organizer.html"><button>＋ Host New Event</button></a>
+      </div>
+
+      <!-- Analytics Cards -->
+      <div class="stats-grid">
+        <div class="stat-card">
+          <span class="lbl">Hosted Events</span>
+          <span class="num" id="statEvents">0</span>
+        </div>
+        <div class="stat-card">
+          <span class="lbl">Passes Reserved</span>
+          <span class="num" id="statTickets">0</span>
+        </div>
+        <div class="stat-card">
+          <span class="lbl">Total Revenue</span>
+          <span class="num" id="statRevenue">₦0</span>
+        </div>
+      </div>
+
+      <div class="sectionhead">
+        <div>
+          <h3>Your Hosted Events</h3>
+          <p>Manage listings and trigger entrance ticket verification.</p>
+        </div>
+      </div>
+
+      <div class="grid" id="myEventsGrid"></div>
+    </main>
   </div>
-  <div class="stat-card">
-    <div class="label">Tickets Issued</div>
-    <div class="value" id="statTickets">0</div>
-  </div>
-  <div class="stat-card">
-    <div class="label">Total Revenue</div>
-    <div class="value" id="statRevenue">₦0</div>
-  </div>
-</div>
 
-<div class="sectionhead">
-  <h2>Your Published Events</h2>
-  <button onclick="window.location.href='organizer.html'">＋ Create New Event</button>
-</div>
-
-<div class="grid" id="myEventsGrid"></div>
-
-<div class="footer">VibePass • Seamless Access</div>
+  <div class="footer">VibePass • Seamless Access</div>
 </div>
 
 <script>
@@ -191,43 +258,71 @@ button:hover{filter:brightness(1.08)}
     }, 5000);
   }
 
-  function renderNavbar() {
+  const pendingToast = JSON.parse(sessionStorage.getItem('cv_flash_toast') || 'null');
+  if (pendingToast) {
+    showToast(pendingToast.tag, pendingToast.msg, pendingToast.icon);
+    sessionStorage.removeItem('cv_flash_toast');
+  }
+
+  function isPastEvent(eventDateStr) {
+    if (!eventDateStr) return false;
+    const today = new Date();
+    today.setHours(0,0,0,0);
+    const eventDate = new Date(eventDateStr + 'T23:59:59');
+    return eventDate < today;
+  }
+
+  async function renderNavbar() {
     let user = null;
-    try {
-      user = JSON.parse(localStorage.getItem('cv_user') || 'null');
-    } catch(e) { user = null; }
+    try { user = JSON.parse(localStorage.getItem('cv_user') || 'null'); } catch(e) { user = null; }
 
-    const nav = document.getElementById('navLinks');
-    if (!nav) return;
-
-    if (!user) {
+    if (!user || user.role !== 'organizer') {
+      sessionStorage.setItem('cv_flash_toast', JSON.stringify({
+        tag: 'ACCESS RESTRICTED',
+        msg: 'Organizer account required to access dashboard.',
+        icon: '🔐'
+      }));
       window.location.href = 'login.html';
       return;
     }
 
-    if (user.role === 'organizer') {
-      nav.innerHTML = `
-        <a href="index.html">Discover</a>
-        <a href="tickets.html">My Tickets</a>
-        <a href="organizers.html">Organizers</a>
-        <a href="organizer_dashboard.html" class="active">Dashboard</a>
-        <a href="organizer.html">＋ Create Event</a>
-        <a href="verify.html">Scan Tickets</a>
-        <a href="#" onclick="logout()" class="logout-btn">Logout (${esc(user.nickname)})</a>
-      `;
-    } else {
-      nav.innerHTML = `
-        <a href="index.html">Discover</a>
-        <a href="tickets.html">My Tickets</a>
-        <a href="organizers.html">Organizers</a>
-        <a href="#" onclick="logout()" class="logout-btn">Logout (${esc(user.nickname)})</a>
-      `;
-    }
-  }
+    const nav = document.getElementById('navLinks');
+    if (!nav) return;
 
-  function esc(s){ return String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
-  function niceDate(d){ if(!d)return 'Date TBA'; return new Date(d+'T12:00:00').toLocaleDateString('en-NG',{day:'numeric',month:'short',year:'numeric'}); }
-  function money(n){ return Number(n)===0?'Free':'₦'+Number(n).toLocaleString('en-NG'); }
+    nav.innerHTML = `
+      <a href="index.html">Discover</a>
+      <a href="tickets.html">My Tickets</a>
+      <a href="organizers.html">Organizers</a>
+      <a href="organizer_dashboard.html" class="active">My Dashboard</a>
+      <a href="organizer.html">＋ Create Event</a>
+      <a href="verify.html">Scan Tickets</a>
+      <a href="#" onclick="logout()" class="logout-btn">Logout (${esc(user.nickname)})</a>
+    `;
+
+    // Populate Sidebar Profile Details
+    const nickname = user.nickname || user.name || 'Organizer Host';
+    const initial = nickname.charAt(0).toUpperCase();
+
+    // Dynamically retrieve true account email from Supabase session if needed
+    let dynamicEmail = user.email || '';
+    if (!dynamicEmail || dynamicEmail.includes('@campusvibe.local')) {
+      const { data: authData } = await supabaseClient.auth.getUser();
+      if (authData?.user?.email) {
+        dynamicEmail = authData.user.email;
+        user.email = dynamicEmail;
+        localStorage.setItem('cv_user', JSON.stringify(user));
+      }
+    }
+
+    if (!dynamicEmail || dynamicEmail.includes('@campusvibe.local')) {
+      dynamicEmail = user.phone ? `Phone: ${user.phone}` : `${nickname.toLowerCase()}@campusvibe.com`;
+    }
+
+    document.getElementById('profAvatar').textContent = initial;
+    document.getElementById('profNickname').textContent = nickname;
+    document.getElementById('profEmail').textContent = dynamicEmail;
+    document.getElementById('profCampusText').textContent = user.campus || 'SDU, Ozoro';
+  }
 
   function logout() {
     localStorage.removeItem('cv_user');
@@ -240,74 +335,78 @@ button:hover{filter:brightness(1.08)}
     window.location.href = 'login.html';
   }
 
-  async function loadDashboardData() {
-    let user = null;
-    try { user = JSON.parse(localStorage.getItem('cv_user') || 'null'); } catch(e) { user = null; }
+  function esc(s){ return String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
+  function money(n){ return Number(n)===0?'Free':'₦'+Number(n).toLocaleString('en-NG'); }
 
-    if (!user) {
-      window.location.href = 'login.html';
-      return;
-    }
+  async function loadDashboard() {
+    let user = JSON.parse(localStorage.getItem('cv_user') || 'null');
+    const grid = document.getElementById('myEventsGrid');
+    grid.innerHTML = '<div class="empty">Loading your managed events...</div>';
 
-    // Fetch organizer's events from Supabase
-    const { data: myEvents, error } = await supabaseClient
+    const orgIdentifier = (user.nickname || user.name || '').toLowerCase();
+
+    // Query all events from Supabase
+    const { data: allEvents, error } = await supabaseClient
       .from('events')
-      .select('*')
-      .eq('organizer_id', user.id);
+      .select('*');
 
     if (error) {
-      console.error('Error fetching dashboard events:', error);
+      grid.innerHTML = `<div class="empty">Error fetching events: ${esc(error.message)}</div>`;
       return;
     }
 
-    const eventsList = myEvents || [];
-    document.getElementById('statEvents').textContent = eventsList.length;
+    // Filter events belonging to current organizer
+    const myEvents = (allEvents || []).filter(e => String(e.organizer || '').toLowerCase() === orgIdentifier);
 
-    // Fetch total tickets issued for organizer's events
-    const eventIds = eventsList.map(e => e.id);
-    let totalTickets = 0;
-    let totalRevenue = 0;
-
-    if (eventIds.length > 0) {
-      const { data: ticketsData } = await supabaseClient
-        .from('tickets')
-        .select('*, events(price)')
-        .in('event_id', eventIds);
-
-      if (ticketsData) {
-        totalTickets = ticketsData.length;
-        ticketsData.forEach(t => {
-          const price = t.events ? Number(t.events.price || 0) : 0;
-          totalRevenue += price;
-        });
-      }
-    }
-
-    document.getElementById('statTickets').textContent = totalTickets;
-    document.getElementById('statRevenue').textContent = money(totalRevenue);
-
-    // Render event list
-    const grid = document.getElementById('myEventsGrid');
     grid.innerHTML = '';
 
-    if (!eventsList.length) {
-      grid.innerHTML = '<div class="empty">You have not created any events yet. Tap "Create New Event" above to get started!</div>';
+    if (!myEvents.length) {
+      grid.innerHTML = `<div class="empty">You have not created any events yet.<br><br><a href="organizer.html"><button>＋ Host Your First Event</button></a></div>`;
+      document.getElementById('statEvents').textContent = '0';
+      document.getElementById('statTickets').textContent = '0';
+      document.getElementById('statRevenue').textContent = '₦0';
       return;
     }
 
-    eventsList.forEach(e => {
+    // Calculate total stats across organizer's events
+    const eventIds = myEvents.map(e => String(e.id));
+    const { data: allTickets } = await supabaseClient.from('tickets').select('*');
+    
+    const myTickets = (allTickets || []).filter(t => eventIds.includes(String(t.event_id)));
+
+    let totalRevenue = 0;
+    myTickets.forEach(t => {
+      const matchEv = myEvents.find(e => String(e.id) === String(t.event_id));
+      if (matchEv) {
+        totalRevenue += Number(matchEv.price || 0);
+      }
+    });
+
+    // Update Stat Cards
+    document.getElementById('statEvents').textContent = myEvents.length;
+    document.getElementById('statTickets').textContent = myTickets.length;
+    document.getElementById('statRevenue').textContent = money(totalRevenue);
+
+    // Render Event Cards
+    myEvents.forEach(e => {
+      const ticketCount = myTickets.filter(t => String(t.event_id) === String(e.id)).length;
+      const isPast = isPastEvent(e.date);
       const card = document.createElement('div');
       card.className = 'card';
+
       card.innerHTML = `
-        <h3>${esc(e.name)}</h3>
+        <h3 style="margin:0">${esc(e.name)}</h3>
         <div class="meta">
-          <span>📍 ${esc(e.campus)}</span>
-          <span>📅 ${niceDate(e.date)}</span>
-          <span>🎟️ ${money(e.price)}</span>
+          <span>📍 Venue: ${esc(e.venue)}</span>
+          <span>🎓 Campus: ${esc(e.campus)}</span>
+          <span>📅 Date: ${esc(e.date)}</span>
+          <span>🏷️ Category: ${esc(e.category)}</span>
+          <span>🎟️ Price: ${money(e.price)}</span>
+          <span>👥 Passes Booked: <strong>${ticketCount}</strong></span>
         </div>
-        <p style="color:var(--muted);font-size:13px;margin:0;">${esc(e.venue)}</p>
-        <div style="display:flex;gap:8px;margin-top:auto;padding-top:10px;">
-          <button class="secondary" style="flex:1;" onclick="window.location.href='verify.html'">Scan Door Tickets</button>
+        <div class="tag ${isPast ? 'past-tag' : 'active-tag'}">${isPast ? 'PAST EVENT' : 'LIVE EVENT'}</div>
+        <div style="display:flex;gap:8px;margin-top:auto;">
+          <a href="verify.html" style="flex:1"><button style="width:100%">${isPast ? 'Check Past Passes' : 'Scan Pass Codes'}</button></a>
         </div>
       `;
       grid.appendChild(card);
@@ -315,7 +414,7 @@ button:hover{filter:brightness(1.08)}
   }
 
   renderNavbar();
-  loadDashboardData();
+  loadDashboard();
 </script>
 </body>
 </html>
