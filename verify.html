@@ -1,38 +1,59 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Vibe Pass — Scan & Verify Tickets</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Scan & Verify Tickets — VibePass</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-:root{--bg:#0c1020;--panel:#151b30;--panel2:#1c2440;--text:#f4f6ff;--muted:#aeb8d4;--accent:#ff7b36;--green:#61d6a4;--line:#2b3454}
+:root{--bg:#0c1020;--panel:#151b30;--panel2:#1c2440;--text:#f4f6ff;--muted:#aeb8d4;--accent:#ff7b36;--accent2:#8c7bff;--green:#61d6a4;--line:#2b3454}
 *{box-sizing:border-box}
-body{margin:0;background:radial-gradient(circle at 80% 0,#25204d 0,transparent 35%),var(--bg);font-family:Inter,system-ui,-apple-system,sans-serif;color:var(--text);min-height:100vh}
+body{margin:0;background:radial-gradient(circle at 80% 0,#25204d 0,transparent 35%),var(--bg);font-family:Inter,system-ui,-apple-system,sans-serif;color:var(--text)}
 a{text-decoration:none}
-button,input,select{font:inherit}
-button,.btn{cursor:pointer;border:0;border-radius:12px;padding:12px 16px;font-weight:750;background:var(--accent);color:#20120b;display:inline-block;width:100%}
-button:hover,.btn:hover{filter:brightness(1.08)}
-.wrap{max-width:1280px;margin:auto;padding:20px}
-.top{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:14px 0}
-.brand{display:flex;align-items:center;gap:10px;font-weight:900;font-size:22px;letter-spacing:-.5px;cursor:pointer;flex-shrink:0}
+button,input,select,textarea{font:inherit}
+button{cursor:pointer;border:0;border-radius:12px;padding:12px 16px;font-weight:750;background:var(--accent);color:#20120b;transition:filter 0.2s}
+button.secondary{background:var(--panel2);color:var(--text);border:1px solid var(--line)}
+button:hover{filter:brightness(1.08)}
+.wrap{max-width:1280px;margin:auto;padding:20px;position:relative}
+
+.top{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:14px 0;position:relative}
+.brand{display:flex;align-items:center;gap:10px;font-weight:900;font-size:22px;letter-spacing:-.5px;cursor:pointer;flex-shrink:0;color:var(--text)}
 .logo{width:38px;height:38px;border-radius:13px;background:linear-gradient(135deg,var(--accent),#ffcb69);display:grid;place-items:center;color:#261306;font-size:21px}
 .brand small{display:block;font-size:10px;letter-spacing:1.6px;color:var(--muted);font-weight:700}
 
-/* Standardized Compact Navigation Header */
-.nav{display:flex;gap:4px;align-items:center;flex-wrap:wrap;justify-content:flex-end}
+/* Standardized Navigation Header */
+.nav{display:flex;gap:6px;align-items:center;flex-wrap:wrap;justify-content:flex-end}
 .nav a{background:transparent;color:var(--muted);padding:8px 12px;border-radius:12px;font-weight:750;display:inline-flex;align-items:center;gap:4px;font-size:13px;cursor:pointer;border:1px solid transparent;transition:all 0.2s;white-space:nowrap;line-height:1.2}
 .nav a:hover{color:var(--text);border-color:var(--line);background:var(--panel2)}
 .nav a.active{background:var(--panel2);color:white;border-color:var(--line)}
 .nav a.logout-btn{color:#ffb38b;border-color:rgba(255,123,54,0.2)}
 .nav a.logout-btn:hover{background:rgba(255,123,54,0.1)}
 
-.scan-box{max-width:520px;margin:30px auto;background:var(--panel);border:1px solid var(--line);border-radius:24px;padding:32px;text-align:center}
-.field{display:flex;flex-direction:column;gap:6px;margin-bottom:16px;text-align:left}
-.field label{font-size:12px;color:var(--muted);font-weight:750}
-.field input{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:14px;color:var(--text);outline:none;width:100%;font-family:monospace;font-size:16px;letter-spacing:1px;text-transform:uppercase}
-.field input:focus{border-color:var(--accent)}
-.result{margin-top:20px;padding:16px;border-radius:16px;background:var(--panel2);border:1px solid var(--line);text-align:left;display:none}
-.footer{color:#7782a4;font-size:12px;text-align:center;padding:40px 0 10px}
+/* Mobile Hamburger Toggle Button */
+.menu-toggle {
+  display: none;
+  background: var(--panel2);
+  border: 1px solid var(--line);
+  color: var(--text);
+  font-size: 1.25rem;
+  padding: 8px 12px;
+  border-radius: 12px;
+  cursor: pointer;
+}
+
+.box{background:var(--panel);border:1px solid var(--line);border-radius:24px;padding:28px;max-width:560px;margin:30px auto;text-align:center}
+.box h1{font-size:26px;letter-spacing:-1px;margin:0 0 8px 0}
+.box p{color:var(--muted);font-size:14px;margin:0 0 24px 0}
+
+.scan-input-group{display:flex;gap:10px;margin-bottom:20px}
+.scan-input-group input{flex:1;background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:12px 16px;color:var(--text);font-family:monospace;font-size:16px;font-weight:700;outline:none}
+.scan-input-group input:focus{border-color:var(--accent)}
+
+.result-card{background:var(--panel2);border:1px solid var(--line);border-radius:18px;padding:20px;margin-top:20px;text-align:left;display:none}
+.result-card.success{border-color:var(--green)}
+.result-card.error{border-color:#ff5252}
+
+.footer{color:#7782a4;font-size:12px;text-align:center;padding:30px 0 10px}
 
 /* Toast Notification Banner */
 .cv-toast-container { position: fixed; top: 20px; right: 20px; z-index: 9999; display: flex; flex-direction: column; gap: 10px; pointer-events: none; }
@@ -46,40 +67,77 @@ button:hover,.btn:hover{filter:brightness(1.08)}
 .cv-toast-close { background: transparent; border: 0; color: var(--muted); font-size: 18px; padding: 0; cursor: pointer; line-height: 1; }
 @keyframes slideIn { from { opacity: 0; transform: translateY(-20px) scale(0.95); } to { opacity: 1; transform: translateY(0) scale(1); } }
 @keyframes slideOut { from { opacity: 1; transform: translateY(0) scale(1); } to { opacity: 0; transform: translateY(-20px) scale(0.95); } }
+
+/* Mobile Navigation Breakpoint */
+@media(max-width:850px){
+  .menu-toggle { display: block; }
+  .nav {
+    display: none;
+    flex-direction: column;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    padding: 16px;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.8);
+    z-index: 1000;
+    align-items: stretch;
+    justify-content: flex-start;
+  }
+  .nav.active { display: flex; }
+  .nav a { justify-content: center; padding: 12px; font-size: 14px; width: 100%; }
+  .scan-input-group { flex-direction: column; }
+}
+@media(max-width:520px){
+  .wrap{padding:13px}
+  .box{padding:20px}
+}
 </style>
 </head>
 <body>
+
 <div class="wrap">
-  <header class="top">
-    <a href="index.html" class="brand">
-      <div class="logo">✦</div>
-      <div>Vibe Pass <small>SEAMLESS PASS. YOUR SCENE.</small></div>
-    </a>
-    <nav class="nav" id="navLinks"></nav>
-  </header>
+<header class="top">
+  <a href="index.html" class="brand">
+    <div class="logo">✦</div>
+    <div>VibePass <small>SEAMLESS ACCESS</small></div>
+  </a>
+  <button class="menu-toggle" id="menuToggle" aria-label="Toggle Navigation">☰</button>
+  <nav class="nav" id="navLinks"></nav>
+</header>
 
-  <div class="scan-box">
-    <h2 style="margin:0 0 6px">🔍 Entry Verification</h2>
-    <p style="color:var(--muted);font-size:13px;margin:0 0 24px">Enter attendee pass reference code to verify entry.</p>
+<div class="box">
+  <h1>🔍 Door Scanner & Verification</h1>
+  <p>Enter or scan the attendee's Ticket Reference ID for instant door check-in.</p>
 
-    <form id="verifyForm">
-      <div class="field">
-        <label>Pass Code Reference</label>
-        <input type="text" id="ticketCode" placeholder="e.g. CV-X89AB" required>
-      </div>
-      <button type="submit">Verify & Check-In Pass</button>
-    </form>
+  <form onsubmit="verifyTicket(event)" class="scan-input-group">
+    <input type="text" id="ticketInput" placeholder="e.g. CV-A1B2C" required style="text-transform:uppercase;">
+    <button type="submit" id="verifyBtn">Verify Ticket</button>
+  </form>
 
-    <div id="verifyResult" class="result"></div>
-  </div>
+  <div id="resultCard" class="result-card"></div>
+</div>
 
-  <div class="footer">Vibe Pass • Seamless Pass</div>
+<div class="footer">VibePass • Seamless Access</div>
 </div>
 
 <script>
   const SUPABASE_URL = 'https://ylbqwgigsvdrglgjcpyu.supabase.co';
   const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlsYnF3Z2lnc3ZkcmdsZ2pjcHl1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTI2NDQ1OTUsImV4cCI6MjEwODIyMDU5NX0.VjhL9UjElDZTdyjM3tX7qnk-8U_Qgrehq6yxkeVLELw';
   const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+  // Mobile Menu Toggle Script
+  const menuToggle = document.getElementById('menuToggle');
+  const navLinksEl = document.getElementById('navLinks');
+  if (menuToggle && navLinksEl) {
+    menuToggle.addEventListener('click', () => {
+      navLinksEl.classList.toggle('active');
+      menuToggle.textContent = navLinksEl.classList.contains('active') ? '✕' : '☰';
+    });
+  }
 
   function showToast(badgeText, title, icon = '✦') {
     let container = document.getElementById('toastContainer');
@@ -112,104 +170,113 @@ button:hover,.btn:hover{filter:brightness(1.08)}
     }, 5000);
   }
 
-  const pendingToast = JSON.parse(sessionStorage.getItem('cv_flash_toast') || 'null');
-  if (pendingToast) {
-    showToast(pendingToast.tag, pendingToast.msg, pendingToast.icon);
-    sessionStorage.removeItem('cv_flash_toast');
-  }
-
   function renderNavbar() {
     let user = null;
-    try { user = JSON.parse(localStorage.getItem('cv_user') || 'null'); } catch(e) { user = null; }
-
-    if (!user || user.role !== 'organizer') {
-      sessionStorage.setItem('cv_flash_toast', JSON.stringify({
-        tag: 'ACCESS RESTRICTED',
-        msg: 'Organizer access required.',
-        icon: '🔐'
-      }));
-      window.location.href = 'login.html';
-      return;
-    }
+    try {
+      user = JSON.parse(localStorage.getItem('cv_user') || 'null');
+    } catch(e) { user = null; }
 
     const nav = document.getElementById('navLinks');
     if (!nav) return;
 
-    nav.innerHTML = `
-      <a href="index.html">Discover</a>
-      <a href="tickets.html">My Tickets</a>
-      <a href="organizers.html">Organizers</a>
-      <a href="organizer_dashboard.html">My Dashboard</a>
-      <a href="organizer.html">＋ Create Event</a>
-      <a href="verify.html" class="active">Scan Tickets</a>
-      <a href="#" onclick="logout()" class="logout-btn">Logout (${esc(user.nickname)})</a>
-    `;
-  }
+    if (!user) {
+      window.location.href = 'login.html';
+      return;
+    }
 
-  function logout() {
-    localStorage.removeItem('cv_user');
-    supabaseClient.auth.signOut();
-    sessionStorage.setItem('cv_flash_toast', JSON.stringify({
-      tag: 'AUTHENTICATION',
-      msg: 'Logged out successfully.',
-      icon: '🔒'
-    }));
-    window.location.href = 'login.html';
+    if (user.role === 'organizer') {
+      nav.innerHTML = `
+        <a href="index.html">Discover</a>
+        <a href="tickets.html">My Tickets</a>
+        <a href="organizers.html">Organizers</a>
+        <a href="organizer_dashboard.html">Dashboard</a>
+        <a href="organizer.html">＋ Create Event</a>
+        <a href="verify.html" class="active">Scan Tickets</a>
+        <a href="#" onclick="logout()" class="logout-btn">Logout (${esc(user.nickname)})</a>
+      `;
+    } else {
+      nav.innerHTML = `
+        <a href="index.html">Discover</a>
+        <a href="tickets.html">My Tickets</a>
+        <a href="organizers.html">Organizers</a>
+        <a href="#" onclick="logout()" class="logout-btn">Logout (${esc(user.nickname)})</a>
+      `;
+    }
   }
 
   function esc(s){ return String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
 
-  document.getElementById('verifyForm').addEventListener('submit', async (e) => {
+  function logout() {
+    localStorage.removeItem('cv_user');
+    supabaseClient.auth.signOut();
+    window.location.href = 'login.html';
+  }
+
+  async function verifyTicket(e) {
     e.preventDefault();
-    const codeInput = document.getElementById('ticketCode');
-    const code = codeInput.value.trim().toUpperCase();
-    const resultBox = document.getElementById('verifyResult');
+    const code = document.getElementById('ticketInput').value.trim().toUpperCase();
+    const resultCard = document.getElementById('resultCard');
+    const btn = document.getElementById('verifyBtn');
 
-    resultBox.style.display = 'block';
-    resultBox.innerHTML = '<p style="margin:0;color:var(--muted)">Searching ticket database...</p>';
+    if (!code) return;
 
-    const { data: ticket, error } = await supabaseClient
+    btn.textContent = 'Checking...';
+    btn.disabled = true;
+
+    // Search for ticket in Supabase
+    let { data: ticket, error } = await supabaseClient
       .from('tickets')
       .select('*, events(*)')
       .eq('id', code)
       .single();
 
+    btn.textContent = 'Verify Ticket';
+    btn.disabled = false;
+
     if (error || !ticket) {
-      resultBox.innerHTML = `
-        <h4 style="margin:0 0 4px;color:#ff7b36">⚠️ INVALID / NOT FOUND</h4>
-        <p style="margin:0;font-size:13px;color:var(--muted)">Reference code "${esc(code)}" does not exist.</p>
+      resultCard.className = 'result-card error';
+      resultCard.style.display = 'block';
+      resultCard.innerHTML = `
+        <h3 style="color:#ff5252;margin:0 0 6px 0;">❌ Invalid Ticket Pass</h3>
+        <p style="margin:0;color:var(--muted);font-size:14px;">Reference ID <strong>"${esc(code)}"</strong> was not found in the database.</p>
       `;
-      showToast('INVALID PASS', `Ticket ${code} was not found.`, '⚠️');
+      showToast('INVALID PASS', 'Ticket not found', '⚠️');
       return;
     }
 
-    if (ticket.status === 'used') {
-      resultBox.innerHTML = `
-        <h4 style="margin:0 0 4px;color:#ff7b36">🛑 TICKET ALREADY USED</h4>
-        <p style="margin:0;font-size:13px;color:var(--muted)">Attendee: ${esc(ticket.user_name)}<br>Event: ${esc(ticket.events?.name || 'Event')}</p>
+    const eventName = ticket.events ? ticket.events.name : 'Campus Event';
+    const isAlreadyUsed = ticket.status === 'used';
+
+    if (isAlreadyUsed) {
+      resultCard.className = 'result-card error';
+      resultCard.style.display = 'block';
+      resultCard.innerHTML = `
+        <h3 style="color:#ff5252;margin:0 0 6px 0;">⚠️ Already Used</h3>
+        <p style="margin:0;color:var(--muted);font-size:14px;">
+          Pass <strong>${esc(ticket.id)}</strong> for <strong>${esc(eventName)}</strong> was already scanned and used.
+        </p>
       `;
-      showToast('DUPLICATE PASS', `Ticket ${code} has already been checked in!`, '🛑');
+      showToast('ENTRY DENIED', 'Pass already scanned', '🚫');
       return;
     }
 
-    // Mark ticket as used in Supabase
+    // Mark as used in database
     await supabaseClient
       .from('tickets')
       .update({ status: 'used' })
       .eq('id', code);
 
-    resultBox.innerHTML = `
-      <h4 style="margin:0 0 4px;color:var(--green)">✅ VALID — CHECKED IN</h4>
-      <p style="margin:0;font-size:13px;color:var(--text)">
-        <strong>Attendee:</strong> ${esc(ticket.user_name)}<br>
-        <strong>Event:</strong> ${esc(ticket.events?.name || 'Event')}<br>
-        <strong>Status:</strong> Pass redeemed successfully.
-      </p>
+    resultCard.className = 'result-card success';
+    resultCard.style.display = 'block';
+    resultCard.innerHTML = `
+      <h3 style="color:var(--green);margin:0 0 6px 0;">✅ Access Granted</h3>
+      <p style="margin:0 0 8px 0;color:var(--text);font-size:15px;">Pass Holder: <strong>${esc(ticket.user_name || 'Attendee')}</strong></p>
+      <p style="margin:0;color:var(--muted);font-size:13px;">Event: ${esc(eventName)} | Pass ID: ${esc(ticket.id)}</p>
     `;
 
-    showToast('ENTRY VERIFIED', `Pass ${code} redeemed for ${ticket.user_name}!`, '✅');
-    codeInput.value = '';
-  });
+    showToast('ENTRY GRANTED', `Check-in complete for ${ticket.user_name || 'Attendee'}`, '🎉');
+    document.getElementById('ticketInput').value = '';
+  }
 
   renderNavbar();
 </script>
