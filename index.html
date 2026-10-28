@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Tag Line — Seamless Access</title>
+<title>Tag Line — Discover Events & Access Tiers</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 :root{--bg:#0c1020;--panel:#151b30;--panel2:#1c2440;--text:#f4f6ff;--muted:#aeb8d4;--accent:#ff7b36;--accent2:#8c7bff;--green:#61d6a4;--line:#2b3454}
@@ -140,14 +140,14 @@ button:hover{filter:brightness(1.08)}
 <section id="discover">
   <div class="hero">
     <div>
-      <div class="eyebrow">Campus life, all in one place</div>
+      <div class="eyebrow">Events, Nightlife & Experiences</div>
       <h1>Find your people.<br>Catch your vibe.</h1>
-      <p>Discover comedy nights, raves, carnivals, gaming tournaments and more — starting around campus and other campuses around you.</p>
+      <p>Discover comedy nights, raves, carnivals, gaming tournaments, and table packages — across campuses, clubs, and venues near you.</p>
       <div class="actions">
         <button onclick="document.getElementById('eventGrid').scrollIntoView({behavior:'smooth'})">Explore events ↓</button>
       </div>
     </div>
-    <div class="hero-art"><div>VIBEPASS LIVE<br><span style="color:#ffc18f">Seamless Access Everywhere.</span></div></div>
+    <div class="hero-art"><div>TAGLINE LIVE<br><span style="color:#ffc18f">Seamless Access Everywhere.</span></div></div>
   </div>
   
   <div class="filters">
@@ -182,14 +182,14 @@ button:hover{filter:brightness(1.08)}
   </div>
 
   <div class="sectionhead">
-    <div><h2>Happening around campus</h2><p>Fetched live from your campus.</p></div>
+    <div><h2>Happening around you</h2><p>Fetched live from database.</p></div>
     <span class="tag" id="count">0 events</span>
   </div>
   
   <div class="grid" id="eventGrid"></div>
 </section>
 
-<div class="footer">Tag Line • Seamless Access</div>
+<div class="footer">TagLine • Seamless Access</div>
 </div>
 
 <div id="modal" class="modal hidden" onclick="if(event.target.id==='modal')closeModal()">
@@ -339,7 +339,7 @@ button:hover{filter:brightness(1.08)}
     grid.innerHTML = '';
     
     if(!list.length){
-      grid.innerHTML = '<div class="empty" style="grid-column:1/-1">No events found in database matching your filter.</div>';
+      grid.innerHTML = '<div class="empty" style="grid-column:1/-1">No events found matching your filter.</div>';
       return;
     }
     
@@ -370,7 +370,7 @@ button:hover{filter:brightness(1.08)}
             <span class="tag ${isPast ? 'past-tag' : 'active-tag'}" style="margin-left:auto;">${isPast ? 'PAST EVENT' : 'UPCOMING'}</span>
           </div>
           <h3>${esc(e.name)}</h3>
-          <p class="desc">${esc(e.desc||'Discover this campus event.')}</p>
+          <p class="desc">${esc(e.desc||'Discover this event.')}</p>
           <div class="meta"><span class="tag">${esc(e.category)}</span><span>By ${esc(e.organizer)}</span></div>
           <div class="cardfoot">
             <span class="price">${money(e.price)}</span>
@@ -423,25 +423,73 @@ button:hover{filter:brightness(1.08)}
       <h2>${esc(e.name)}</h2>
       <p style="color:var(--muted)">${esc(e.desc||'')}</p>
       <div class="box" style="padding:14px;margin-bottom:14px">
-        <p style="margin:0">📍 ${esc(e.venue)}<br>🎓 ${esc(e.campus)}<br>📅 ${niceDate(e.date)}<br>🎟️ ${money(e.price)}<br>Organizer: ${esc(e.organizer)}</p>
+        <p style="margin:0">
+          📍 <strong>Venue:</strong> ${esc(e.venue)}<br>
+          🎓 <strong>Location:</strong> ${esc(e.campus)}<br>
+          📅 <strong>Date:</strong> ${niceDate(e.date)}<br>
+          👤 <strong>Organizer:</strong> ${esc(e.organizer)}
+        </p>
       </div>
       ${isPast 
         ? `<button disabled style="width:100%;font-size:15px;background:var(--panel2);color:var(--muted);cursor:not-allowed">⌛ Event Has Ended</button>`
-        : `<button onclick="getTicket('${e.id}')" style="width:100%;font-size:15px">🎟️ Claim Ticket Pass</button>`
+        : `<button onclick="showTierSelection('${e.id}')" style="width:100%;font-size:15px">🎟️ Claim Ticket Pass</button>`
       }`;
     document.getElementById('modal').classList.remove('hidden');
   }
 
-  async function getTicket(eventId) {
-    let user = null;
-    try { user = JSON.parse(localStorage.getItem('cv_user') || 'null'); } catch(e) { user = null; }
+  function showTierSelection(eventId) {
+    let e = events.find(x => String(x.id) === String(eventId));
+    if (!e) return;
 
-    if (!user) {
-      window.location.href = 'login.html';
-      return;
+    let tiers = e.tiers;
+    if (typeof tiers === 'string') {
+      try { tiers = JSON.parse(tiers); } catch(err) { tiers = null; }
     }
 
-    const ticketId = 'CV-' + Math.random().toString(36).substring(2, 7).toUpperCase();
+    if (!tiers || !tiers.length) {
+      tiers = [{ name: 'Regular Pass', price: e.price || 0 }];
+    }
+
+    let tierOptionsHTML = tiers.map((t, idx) => `
+      <label style="display:flex;align-items:center;justify-content:space-between;background:var(--panel2);border:1px solid var(--line);padding:12px;border-radius:12px;margin-bottom:8px;cursor:pointer;">
+        <div>
+          <input type="radio" name="selectedTier" value="${idx}" ${idx === 0 ? 'checked' : ''}>
+          <strong style="margin-left:8px;">${esc(t.name)}</strong>
+        </div>
+        <span style="color:var(--accent);font-weight:800;">${money(t.price)}</span>
+      </label>
+    `).join('');
+
+    document.getElementById('modalContent').innerHTML = `
+      <h2>Select Package / Table Tier</h2>
+      <p style="color:var(--muted);font-size:13px;margin-bottom:16px;">Choose your pass or table tier for <strong>${esc(e.name)}</strong>:</p>
+      
+      <form onsubmit="confirmTierTicket(event, '${e.id}')">
+        <div style="margin-bottom:16px;">
+          ${tierOptionsHTML}
+        </div>
+        <button type="submit" style="width:100%;font-size:15px">Confirm & Claim Pass</button>
+      </form>
+    `;
+  }
+
+  async function confirmTierTicket(eventObj, eventId) {
+    eventObj.preventDefault();
+    let user = JSON.parse(localStorage.getItem('cv_user') || 'null');
+    let e = events.find(x => String(x.id) === String(eventId));
+
+    let tiers = e.tiers;
+    if (typeof tiers === 'string') {
+      try { tiers = JSON.parse(tiers); } catch(err) { tiers = null; }
+    }
+    if (!tiers || !tiers.length) {
+      tiers = [{ name: 'Regular Pass', price: e.price || 0 }];
+    }
+
+    const selectedIndex = document.querySelector('input[name="selectedTier"]:checked')?.value || 0;
+    const chosenTier = tiers[selectedIndex] || tiers[0];
+
+    const ticketId = 'TL-' + Math.random().toString(36).substring(2, 7).toUpperCase();
 
     const { error } = await supabaseClient.from('tickets').insert([
       {
@@ -449,6 +497,8 @@ button:hover{filter:brightness(1.08)}
         event_id: eventId,
         user_id: user.id,
         user_name: user.name || user.nickname || 'Attendee',
+        tier_name: chosenTier.name,
+        price: chosenTier.price,
         status: 'valid'
       }
     ]);
@@ -459,21 +509,21 @@ button:hover{filter:brightness(1.08)}
     }
 
     let localTickets = JSON.parse(localStorage.getItem('cv_tickets') || '[]');
-    let targetEvent = events.find(x => String(x.id) === String(eventId));
-    
     localTickets.push({
       id: ticketId,
       user_id: user.id,
-      name: targetEvent ? targetEvent.name : 'Campus Event',
-      date: targetEvent ? targetEvent.date : '',
-      venue: targetEvent ? targetEvent.venue : '',
-      campus: targetEvent ? targetEvent.campus : '',
+      name: e.name + ' (' + chosenTier.name + ')',
+      date: e.date,
+      venue: e.venue,
+      campus: e.campus,
+      tier_name: chosenTier.name,
+      price: chosenTier.price,
       status: 'valid'
     });
     localStorage.setItem('cv_tickets', JSON.stringify(localTickets));
 
     closeModal();
-    showToast('TICKET RESERVED', `Ticket purchase successful! Reference: ${ticketId}`, '🎟️');
+    showToast('PASS RESERVED', `Pass generated for ${chosenTier.name}! Ref: ${ticketId}`, '🎟️');
   }
 
   function closeModal(){ document.getElementById('modal').classList.add('hidden'); }
