@@ -6,28 +6,22 @@
 <title>Tag Line — My Tickets</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-:root{--bg:#0c1020;--panel:#151b30;--panel2:#1c2440;--text:#f4f6ff;--muted:#aeb8d4;--accent:#ff7b36;--accent2:#8c7bff;--green:#61d6a4;--line:#2b3454}
+:root{--bg:#0c1020;--panel:#151b30;--panel2:#1c2440;--text:#f4f6ff;--muted:#aeb8d4;--accent:#ff7b36;--line:#2b3454;--green:#61d6a4}
 *{box-sizing:border-box}
-body{margin:0;background:radial-gradient(circle at 80% 0,#25204d 0,transparent 35%),var(--bg);font-family:Inter,system-ui,-apple-system,sans-serif;color:var(--text)}
-a{text-decoration:none}
-button,input,select,textarea{font:inherit}
-button{cursor:pointer;border:0;border-radius:12px;padding:10px 14px;font-weight:750;background:var(--accent);color:#20120b;transition:filter 0.2s}
-button.secondary{background:var(--panel2);color:var(--text);border:1px solid var(--line)}
-button:hover{filter:brightness(1.08)}
-.wrap{max-width:1280px;margin:auto;padding:20px;position:relative}
+body{margin:0;background:radial-gradient(circle at 80% 0,#25204d 0,transparent 35%),var(--bg);font-family:Inter,system-ui,sans-serif;color:var(--text);min-height:100vh}
+a{text-decoration:none;color:inherit}
+.wrap{max-width:1180px;margin:auto;padding:20px;position:relative}
 
-.top{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:14px 0;position:relative}
-.brand{display:flex;align-items:center;gap:10px;font-weight:900;font-size:22px;letter-spacing:-.5px;cursor:pointer;flex-shrink:0;color:var(--text)}
+.top{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:10px 0 22px;position:relative}
+.brand{display:flex;align-items:center;gap:10px;font-weight:900;font-size:22px;color:var(--text)}
 .logo{width:38px;height:38px;border-radius:13px;background:linear-gradient(135deg,var(--accent),#ffcb69);display:grid;place-items:center;color:#261306;font-size:21px}
 .brand small{display:block;font-size:10px;letter-spacing:1.6px;color:var(--muted);font-weight:700}
 
 /* Standardized Navigation Header */
-.nav{display:flex;gap:6px;align-items:center;flex-wrap:wrap;justify-content:flex-end}
-.nav a{background:transparent;color:var(--muted);padding:8px 12px;border-radius:12px;font-weight:750;display:inline-flex;align-items:center;gap:4px;font-size:13px;cursor:pointer;border:1px solid transparent;transition:all 0.2s;white-space:nowrap;line-height:1.2}
-.nav a:hover{color:var(--text);border-color:var(--line);background:var(--panel2)}
-.nav a.active{background:var(--panel2);color:white;border-color:var(--line)}
-.nav a.logout-btn{color:#ffb38b;border-color:rgba(255,123,54,0.2)}
-.nav a.logout-btn:hover{background:rgba(255,123,54,0.1)}
+.nav{display:flex;gap:6px;flex-wrap:wrap;align-items:center;justify-content:flex-end}
+.nav a{padding:10px 14px;border-radius:12px;color:var(--muted);font-weight:700;font-size:13px;transition:all 0.2s}
+.nav a:hover{color:var(--text);background:var(--panel2)}
+.nav a.active{background:var(--panel2);color:white}
 
 /* Mobile Hamburger Toggle Button */
 .menu-toggle {
@@ -41,23 +35,17 @@ button:hover{filter:brightness(1.08)}
   cursor: pointer;
 }
 
-.sectionhead{display:flex;align-items:end;justify-content:space-between;gap:12px;margin:24px 0 16px}
-.sectionhead h1{margin:0;font-size:28px;letter-spacing:-1px}
-.sectionhead p{margin:6px 0 0;color:var(--muted);font-size:14px}
-
-.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
-.card{background:var(--panel);border:1px solid var(--line);border-radius:20px;padding:20px;display:flex;flex-direction:column;gap:12px}
-.card h3{margin:0;font-size:18px}
-.meta{color:var(--muted);font-size:13px;display:flex;gap:10px;flex-wrap:wrap}
-
-.tag{display:inline-flex;background:#282b4a;color:#d9d7ff;border-radius:999px;padding:4px 10px;font-size:11px;font-weight:800;align-self:flex-start}
-.tag.valid-tag{background:rgba(97,214,164,0.15);color:var(--green)}
-.tag.used-tag{background:rgba(255,255,255,0.08);color:var(--muted)}
-
-.empty{padding:32px;text-align:center;color:var(--muted);border:1px dashed var(--line);border-radius:18px;grid-column:1/-1}
+.sectionhead{display:flex;align-items:end;justify-content:space-between;gap:12px;margin:28px 0 14px}
+.ticket{background:#fff;color:#171827;border-radius:18px;padding:20px;max-width:420px;margin:14px 0;position:relative;box-shadow:0 10px 30px rgba(0,0,0,0.4)}
+.ticketlogo{font-weight:950;color:#ea672f;font-size:12px;margin-bottom:8px;display:flex;justify-content:space-between}
+.badge{padding:4px 8px;border-radius:6px;font-size:10px;font-weight:800;text-transform:uppercase}
+.badge.valid{background:#e6f7f0;color:#108a55}
+.badge.used{background:#ffebe6;color:#d9381e}
+.tier-badge{display:inline-block;background:#151b30;color:#ff7b36;padding:4px 10px;border-radius:8px;font-size:12px;font-weight:800;margin-top:8px}
+.empty{padding:32px;text-align:center;color:var(--muted);border:1px dashed var(--line);border-radius:18px}
 .footer{color:#7782a4;font-size:12px;text-align:center;padding:30px 0 10px}
 
-/* Toast Notification Banner */
+/* Toast Notification Styles */
 .cv-toast-container { position: fixed; top: 20px; right: 20px; z-index: 9999; display: flex; flex-direction: column; gap: 10px; pointer-events: none; }
 .cv-toast { pointer-events: auto; background: rgba(21, 27, 48, 0.88); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 18px; padding: 14px 18px; min-width: 300px; max-width: 380px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); display: flex; align-items: flex-start; gap: 12px; animation: slideIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards; position: relative; }
 .cv-toast-icon { width: 36px; height: 36px; border-radius: 10px; background: var(--panel2); border: 1px solid var(--line); display: grid; place-items: center; font-size: 18px; flex-shrink: 0; }
@@ -90,44 +78,36 @@ button:hover{filter:brightness(1.08)}
     justify-content: flex-start;
   }
   .nav.active { display: flex; }
-  .nav a { justify-content: center; padding: 12px; font-size: 14px; width: 100%; }
-  .grid { grid-template-columns: 1fr; }
-}
-@media(max-width:520px){
-  .wrap{padding:13px}
+  .nav a { justify-content: center; padding: 12px; font-size: 14px; width: 100%; text-align: center; }
 }
 </style>
 </head>
 <body>
-
 <div class="wrap">
-<header class="top">
-  <a href="index.html" class="brand">
-    <div class="logo">✦</div>
-    <div>Tag Line <small>SEAMLESS ACCESS</small></div>
-  </a>
-  <button class="menu-toggle" id="menuToggle" aria-label="Toggle Navigation">☰</button>
-  <nav class="nav" id="navLinks"></nav>
-</header>
+  <header class="top">
+    <a href="index.html" class="brand">
+      <div class="logo">✦</div>
+      <div>Tag Line <small>SEAMLESS ACCESS</small></div>
+    </a>
+    <button class="menu-toggle" id="menuToggle" aria-label="Toggle Navigation">☰</button>
+    <nav class="nav" id="navLinks">
+      <a href="index.html">Discover</a>
+      <a href="tickets.html" class="active">My tickets</a>
+      <a href="organizers.html">Organizers</a>
+      <a href="#" onclick="logout()" style="color:#ffb38b">Logout</a>
+    </nav>
+  </header>
 
-<div class="sectionhead">
-  <div>
-    <h1>🎟️ Digital Pass Wallet</h1>
-    <p>Your reserved event passes and entry QR codes.</p>
+  <div class="sectionhead">
+    <div><h2>My tickets & Passes</h2><p>Your saved event tickets and reserved table passes.</p></div>
   </div>
-  <span class="tag" id="passCount">0 Passes</span>
-</div>
 
-<div class="grid" id="ticketsGrid"></div>
+  <div id="ticketList"></div>
 
-<div class="footer">Tag Line • Seamless Access</div>
+  <div class="footer">Tag Line • Seamless Access</div>
 </div>
 
 <script>
-  const SUPABASE_URL = 'https://ylbqwgigsvdrglgjcpyu.supabase.co';
-  const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlsYnF3Z2lnc3ZkcmdsZ2pjcHl1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTI2NDQ1OTUsImV4cCI6MjEwODIyMDU5NX0.VjhL9UjElDZTdyjM3tX7qnk-8U_Qgrehq6yxkeVLELw';
-  const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
   // Mobile Menu Toggle Script
   const menuToggle = document.getElementById('menuToggle');
   const navLinksEl = document.getElementById('navLinks');
@@ -138,119 +118,57 @@ button:hover{filter:brightness(1.08)}
     });
   }
 
-  function renderNavbar() {
-    let user = null;
-    try {
-      user = JSON.parse(localStorage.getItem('cv_user') || 'null');
-    } catch(e) { user = null; }
+  // 1. Route Security Check
+  let user = null;
+  try {
+    user = JSON.parse(localStorage.getItem('cv_user') || 'null');
+  } catch(e) { user = null; }
 
-    const nav = document.getElementById('navLinks');
-    if (!nav) return;
-
-    if (!user) {
-      window.location.href = 'login.html';
-      return;
-    }
-
-    if (user.role === 'organizer') {
-      nav.innerHTML = `
-        <a href="index.html">Discover</a>
-        <a href="tickets.html" class="active">My Tickets</a>
-        <a href="organizers.html">Organizers</a>
-        <a href="organizer_dashboard.html">Dashboard</a>
-        <a href="organizer.html">＋ Create Event</a>
-        <a href="verify.html">Scan Tickets</a>
-        <a href="#" onclick="logout()" class="logout-btn">Logout (${esc(user.nickname)})</a>
-      `;
-    } else {
-      nav.innerHTML = `
-        <a href="index.html">Discover</a>
-        <a href="tickets.html" class="active">My Tickets</a>
-        <a href="organizers.html">Organizers</a>
-        <a href="#" onclick="logout()" class="logout-btn">Logout (${esc(user.nickname)})</a>
-      `;
-    }
+  if (!user) {
+    window.location.href = 'login.html';
   }
 
-  function esc(s){ return String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
-  function niceDate(d){ if(!d)return 'Date TBA'; return new Date(d+'T12:00:00').toLocaleDateString('en-NG',{day:'numeric',month:'short',year:'numeric'}); }
+  const SUPABASE_URL = 'https://ylbqwgigsvdrglgjcpyu.supabase.co';
+  const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlsYnF3Z2lnc3ZkcmdsZ2pjcHl1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTI2NDQ1OTUsImV4cCI6MjEwODIyMDU5NX0.VjhL9UjElDZTdyjM3tX7qnk-8U_Qgrehq6yxkeVLELw';
+  const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
   function logout() {
     localStorage.removeItem('cv_user');
     supabaseClient.auth.signOut();
-    window.location.href = 'login.html';
+    window.location.href = 'index.html';
   }
 
-  async function loadMyTickets() {
-    let user = null;
-    try { user = JSON.parse(localStorage.getItem('cv_user') || 'null'); } catch(e) { user = null; }
+  function niceDate(d){ return !d ? 'Date TBA' : new Date(d+'T12:00:00').toLocaleDateString('en-NG',{day:'numeric',month:'short',year:'numeric'}); }
+  function money(n){ return Number(n)===0?'Free':'₦'+Number(n).toLocaleString('en-NG'); }
+  function esc(s){ return String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
 
-    if (!user) {
-      window.location.href = 'login.html';
+  function renderTickets(){
+    let tickets = JSON.parse(localStorage.getItem('cv_tickets') || '[]');
+    let box = document.getElementById('ticketList');
+
+    if(!tickets.length){
+      box.innerHTML = '<div class="empty">No passes or tables booked yet. Check out events on the <a href="index.html" style="color:var(--accent)">Discover</a> page!</div>';
       return;
     }
 
-    let tickets = [];
-
-    // Fetch user tickets from Supabase
-    const { data, error } = await supabaseClient
-      .from('tickets')
-      .select('*, events(*)')
-      .eq('user_id', user.id);
-
-    if (!error && data && data.length > 0) {
-      tickets = data;
-    } else {
-      // Fallback to local storage
-      const local = JSON.parse(localStorage.getItem('cv_tickets') || '[]');
-      tickets = local.map(t => ({
-        id: t.id,
-        status: t.status || 'valid',
-        events: {
-          name: t.name,
-          date: t.date,
-          venue: t.venue,
-          campus: t.campus
-        }
-      }));
-    }
-
-    document.getElementById('passCount').textContent = tickets.length + ' Pass' + (tickets.length === 1 ? '' : 'es');
-    const grid = document.getElementById('ticketsGrid');
-    grid.innerHTML = '';
-
-    if (!tickets.length) {
-      grid.innerHTML = '<div class="empty">You have no active event tickets yet. Explore events on the <a href="index.html" style="color:var(--accent);">Discover page</a>!</div>';
-      return;
-    }
-
-    tickets.forEach(t => {
-      const e = t.events || {};
-      const isValid = (t.status || 'valid') === 'valid';
-
-      const card = document.createElement('div');
-      card.className = 'card';
-      card.innerHTML = `
-        <div style="display:flex;justify-content:space-between;align-items:center;">
-          <span class="tag ${isValid ? 'valid-tag' : 'used-tag'}">${isValid ? 'VALID PASS' : 'USED / SCANNED'}</span>
-          <span style="font-family:monospace;font-size:12px;color:var(--muted);">${esc(t.id)}</span>
+    box.innerHTML = tickets.slice().reverse().map(t=>`
+      <div class="ticket">
+        <div class="ticketlogo">
+          <span>TAGLINE / ENTRY PASS</span>
+          <span class="badge ${t.status === 'used' ? 'used' : 'valid'}">${t.status === 'used' ? 'USED' : 'VALID'}</span>
         </div>
-        <h3>${esc(e.name || 'Campus Event')}</h3>
-        <div class="meta">
-          <span>📍 ${esc(e.campus || 'Campus')}</span>
-          <span>📅 ${niceDate(e.date)}</span>
-        </div>
-        <p style="color:var(--muted);font-size:13px;margin:0;">${esc(e.venue || 'Event Venue')}</p>
-        <button style="width:100%;margin-top:auto;" onclick="window.location.href='ticket.html?id=${t.id}'">
-          📲 View Digital Pass & QR Code
-        </button>
-      `;
-      grid.appendChild(card);
-    });
+        <h2 style="margin:0 0 6px">${esc(t.name)}</h2>
+        <div class="tier-badge">🏷️ ${esc(t.tier_name || 'Regular Pass')} • ${money(t.price || 0)}</div>
+        <p style="margin:12px 0 0;color:#444">
+          📅 ${niceDate(t.date)}<br>
+          📍 ${esc(t.venue)}<br>
+          🎓 ${esc(t.campus)}<br>
+          Reference Code: <strong>${esc(t.id)}</strong>
+        </p>
+      </div>`).join('');
   }
 
-  renderNavbar();
-  loadMyTickets();
+  renderTickets();
 </script>
 </body>
 </html>
