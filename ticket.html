@@ -169,7 +169,9 @@ a{text-decoration:none;color:inherit}
     const nav = document.getElementById('navLinks');
     if (!nav) return;
 
-    if (user && user.role === 'organizer') {
+    const isOrganizer = user && (user.role === 'organizer' || user.is_organizer === true);
+
+    if (isOrganizer) {
       nav.innerHTML = `
         <a href="index.html">Discover</a>
         <a href="tickets.html" class="active">My Tickets</a>
@@ -177,14 +179,14 @@ a{text-decoration:none;color:inherit}
         <a href="organizer_dashboard.html">Dashboard</a>
         <a href="organizer.html">＋ Create Event</a>
         <a href="verify.html">Scan Tickets</a>
-        <a href="#" onclick="logout()" class="logout-btn">Logout (${esc(user.nickname || user.name)})</a>
+        <a href="#" onclick="logout()" class="logout-btn">Logout (${esc(user.nickname || user.name || 'User')})</a>
       `;
     } else {
       nav.innerHTML = `
         <a href="index.html">Discover</a>
         <a href="tickets.html" class="active">My Tickets</a>
         <a href="organizers.html">Organizers</a>
-        <a href="#" onclick="logout()" class="logout-btn">Logout (${esc(user.nickname || user.name)})</a>
+        <a href="#" onclick="logout()" class="logout-btn">Logout (${esc(user.nickname || user.name || 'User')})</a>
       `;
     }
   }
