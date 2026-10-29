@@ -261,6 +261,29 @@ a{text-decoration:none;color:inherit}
         </p>
       </div>`).join('');
   }
+  function downloadPass(ticketId) {
+    const cardEl = document.getElementById('ticketCard-' + ticketId);
+    if (!cardEl) return;
+
+    showToast('PREPARING DOWNLOAD', 'Generating high-res pass image...', '📥');
+
+    const btn = cardEl.querySelector('.download-btn');
+    if (btn) btn.style.display = 'none';
+
+    html2canvas(cardEl, { scale: 3, backgroundColor: '#ffffff' }).then(canvas => {
+      if (btn) btn.style.display = 'block';
+
+      const link = document.createElement('a');
+      link.download = `TagLine-Pass-${ticketId}.png`;
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+      
+      showToast('DOWNLOAD COMPLETE', 'Pass saved to your device!', '✅');
+    }).catch(err => {
+      if (btn) btn.style.display = 'block';
+      showToast('DOWNLOAD ERROR', 'Could not generate pass image.', '⚠️');
+    });
+  }
 
   renderNavbar();
   renderTickets();
