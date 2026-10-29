@@ -37,7 +37,8 @@ a{text-decoration:none;color:inherit}
 }
 
 .sectionhead{display:flex;align-items:end;justify-content:space-between;gap:12px;margin:28px 0 14px}
-.ticket{background:#fff;color:#171827;border-radius:18px;padding:20px;max-width:420px;margin:14px 0;position:relative;box-shadow:0 10px 30px rgba(0,0,0,0.4)}
+.ticket{background:#fff;color:#171827;border-radius:18px;padding:20px;max-width:420px;margin:14px 0;position:relative;box-shadow:0 10px 30px rgba(0,0,0,0.4);cursor:pointer;transition:transform 0.2s,box-shadow 0.2s}
+.ticket:hover{transform:translateY(-3px);box-shadow:0 15px 35px rgba(255,123,54,0.2)}
 .ticketlogo{font-weight:950;color:#ea672f;font-size:12px;margin-bottom:8px;display:flex;justify-content:space-between}
 .badge{padding:4px 8px;border-radius:6px;font-size:10px;font-weight:800;text-transform:uppercase}
 .badge.valid{background:#e6f7f0;color:#108a55}
@@ -95,7 +96,7 @@ a{text-decoration:none;color:inherit}
   </header>
 
   <div class="sectionhead">
-    <div><h2>My tickets & Passes</h2><p>Your saved event tickets and reserved table passes.</p></div>
+    <div><h2>My tickets & Passes</h2><p>Your saved event tickets and reserved table passes. Tap any pass to view/print.</p></div>
   </div>
 
   <div id="ticketList"></div>
@@ -245,7 +246,7 @@ a{text-decoration:none;color:inherit}
     }
 
     box.innerHTML = finalTickets.slice().reverse().map(t=>`
-      <div class="ticket">
+      <div class="ticket" onclick="window.location.href='ticket.html?id=${encodeURIComponent(t.id)}'">
         <div class="ticketlogo">
           <span>TAGLINE / ENTRY PASS</span>
           <span class="badge ${t.status === 'used' ? 'used' : 'valid'}">${t.status === 'used' ? 'USED' : 'VALID'}</span>
