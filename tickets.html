@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Tag Line — My Tickets</title>
+<title>TagLine — My Tickets</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 :root{--bg:#0c1020;--panel:#151b30;--panel2:#1c2440;--text:#f4f6ff;--muted:#aeb8d4;--accent:#ff7b36;--line:#2b3454;--green:#61d6a4}
@@ -22,6 +22,8 @@ a{text-decoration:none;color:inherit}
 .nav a{padding:10px 14px;border-radius:12px;color:var(--muted);font-weight:700;font-size:13px;transition:all 0.2s}
 .nav a:hover{color:var(--text);background:var(--panel2)}
 .nav a.active{background:var(--panel2);color:white}
+.nav a.logout-btn{color:#ffb38b;border:1px solid rgba(255,123,54,0.2)}
+.nav a.logout-btn:hover{background:rgba(255,123,54,0.1)}
 
 /* Mobile Hamburger Toggle Button */
 .menu-toggle {
@@ -87,15 +89,10 @@ a{text-decoration:none;color:inherit}
   <header class="top">
     <a href="index.html" class="brand">
       <div class="logo">✦</div>
-      <div>Tag Line <small>SEAMLESS ACCESS</small></div>
+      <div>TagLine <small>SEAMLESS ACCESS</small></div>
     </a>
     <button class="menu-toggle" id="menuToggle" aria-label="Toggle Navigation">☰</button>
-    <nav class="nav" id="navLinks">
-      <a href="index.html">Discover</a>
-      <a href="tickets.html" class="active">My tickets</a>
-      <a href="organizers.html">Organizers</a>
-      <a href="#" onclick="logout()" style="color:#ffb38b">Logout</a>
-    </nav>
+    <nav class="nav" id="navLinks"></nav>
   </header>
 
   <div class="sectionhead">
@@ -104,7 +101,7 @@ a{text-decoration:none;color:inherit}
 
   <div id="ticketList"></div>
 
-  <div class="footer">Tag Line • Seamless Access</div>
+  <div class="footer">TagLine • Seamless Access</div>
 </div>
 
 <script>
@@ -138,6 +135,32 @@ a{text-decoration:none;color:inherit}
     window.location.href = 'index.html';
   }
 
+  function renderNavbar() {
+    const nav = document.getElementById('navLinks');
+    if (!nav) return;
+
+    const isOrganizer = user && (user.role === 'organizer' || user.is_organizer === true);
+
+    if (isOrganizer) {
+      nav.innerHTML = `
+        <a href="index.html">Discover</a>
+        <a href="tickets.html" class="active">My Tickets</a>
+        <a href="organizers.html">Organizers</a>
+        <a href="organizer_dashboard.html">Dashboard</a>
+        <a href="organizer.html">＋ Create Event</a>
+        <a href="verify.html">Scan Tickets</a>
+        <a href="#" onclick="logout()" class="logout-btn">Logout (${esc(user.nickname || user.name || 'User')})</a>
+      `;
+    } else {
+      nav.innerHTML = `
+        <a href="index.html">Discover</a>
+        <a href="tickets.html" class="active">My Tickets</a>
+        <a href="organizers.html">Organizers</a>
+        <a href="#" onclick="logout()" class="logout-btn">Logout (${esc(user.nickname || user.name || 'User')})</a>
+      `;
+    }
+  }
+
   function niceDate(d){ return !d ? 'Date TBA' : new Date(d+'T12:00:00').toLocaleDateString('en-NG',{day:'numeric',month:'short',year:'numeric'}); }
   function money(n){ return Number(n)===0?'Free':'₦'+Number(n).toLocaleString('en-NG'); }
   function esc(s){ return String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
@@ -168,6 +191,7 @@ a{text-decoration:none;color:inherit}
       </div>`).join('');
   }
 
+  renderNavbar();
   renderTickets();
 </script>
 </body>
