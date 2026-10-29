@@ -211,6 +211,7 @@ button{cursor:pointer;border:0;border-radius:12px;padding:10px 14px;font-weight:
         <div class="ticket-id">🎟️ ${esc(t.id)}</div>
         <h3 style="margin:0">${esc(eventName)}</h3>
         <div class="meta">
+        📅 ${esc(t.events?.date || t.date || 'Date not specified')}
           <span>📍 Venue: ${esc(eventVenue)}</span>
           <span>🎓 Campus: ${esc(eventCampus)}</span>
         </div>
