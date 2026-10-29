@@ -135,7 +135,12 @@ button:hover{filter:brightness(1.08)}
 
   let organizersList = [];
   let allEventsList = [];
-  let follows = JSON.parse(localStorage.getItem('cv_follows') || '[]');
+
+  let currentUser = null;
+  try { currentUser = JSON.parse(localStorage.getItem('cv_user') || 'null'); } catch(e) { currentUser = null; }
+
+  let followsKey = currentUser ? `cv_follows_${currentUser.id}` : 'cv_follows_guest';
+  let follows = JSON.parse(localStorage.getItem(followsKey) || '[]');
 
   const menuToggle = document.getElementById('menuToggle');
   const navLinksEl = document.getElementById('navLinks');
@@ -178,8 +183,7 @@ button:hover{filter:brightness(1.08)}
   }
 
   function renderNavbar() {
-    let user = null;
-    try { user = JSON.parse(localStorage.getItem('cv_user') || 'null'); } catch(e) { user = null; }
+    let user = currentUser;
 
     const nav = document.getElementById('navLinks');
     if (!nav) return;
@@ -320,14 +324,18 @@ button:hover{filter:brightness(1.08)}
       return;
     }
 
-    if(follows.includes(name)) {
-      follows = follows.filter(x=>x!==name);
+    let userFollowsKey = `cv_follows_${user.id}`;
+    let userFollows = JSON.parse(localStorage.getItem(userFollowsKey) || '[]');
+
+    if(userFollows.includes(name)) {
+      userFollows = userFollows.filter(x=>x!==name);
       showToast('ORGANIZER UNFOLLOWED', `You unfollowed ${name}`, '👥');
     } else {
-      follows.push(name);
+      userFollows.push(name);
       showToast('ORGANIZER FOLLOWED', `You are now following ${name}`, '⭐');
     }
-    localStorage.setItem('cv_follows', JSON.stringify(follows));
+    localStorage.setItem(userFollowsKey, JSON.stringify(userFollows));
+    follows = userFollows;
     filterOrganizers();
   }
 
